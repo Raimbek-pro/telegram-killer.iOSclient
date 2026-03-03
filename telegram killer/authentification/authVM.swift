@@ -9,8 +9,20 @@ import Foundation
 import Combine
 
 class authVM : ObservableObject {
+    var router : router
     
-    func sendemail(email : String) async  -> Bool {
-      return await authService().sendEmail(email)
+    init(router: router) {
+        self.router = router
+    }
+    
+    func sendemail(email : String) async   throws {
+        
+          try  await authService().sendEmail(email)
+
+     
+           }
+    
+    func navigate(){
+        self.router.movetoconf()
     }
 }

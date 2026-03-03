@@ -9,16 +9,16 @@ import SwiftUI
 
 struct Auth: View {
     
-   @StateObject var viewModel = authVM()
+    @StateObject var viewModel : authVM
     
-    init(uinav : UINavigationController){
-    
+    init(router :  router ){
+        self._viewModel = StateObject(wrappedValue: authVM(router: router))
     }
    @State var email = ""
     var body: some View {
        textfield
         
-        buttonSend
+       buttonSend
         
         
     }
@@ -35,17 +35,21 @@ struct Auth: View {
     var buttonSend : some View {
         
         Button(action: {
-            var conf = false
+
             Task{
-                conf =   await viewModel.sendemail(email: email)
-                
+                print("sending email")
+                do{
+                   try await viewModel.sendemail(email: email)
+                    UserDefaults().set(email, forKey: "email")
+                    viewModel.navigate()
+                }
+                catch{
+                    print("error")
+                }
+             
                 
             }
-            if conf{
-               // router().movetoconf()
-//                router(navcontroller: self.navigatio)
-            }
-            
+
             
            
         }, label: {
@@ -58,6 +62,3 @@ struct Auth: View {
     }
 }
 
-#Preview {
-    Auth()
-}

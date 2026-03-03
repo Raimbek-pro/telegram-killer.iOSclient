@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import SwiftUI
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
@@ -19,17 +19,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(windowScene: windowScene)
+        let navcontroller = UINavigationController()
+        let router = router(navcontroller: navcontroller)
+        let authview = UIHostingController(rootView: Auth(router: router) )
+       //move to folder
         
         
         
         if UserDefaults().object(forKey: "isAuthorized") == nil {
-            window?.rootViewController = UINavigationController(rootViewController: AuthorizeViewController())  
+        //    window?.rootViewController = UINavigationController(rootViewController: authview)
+            navcontroller.setViewControllers([authview], animated: true)
+            window?.rootViewController = navcontroller
             
         }
-        
-        
         else{
-            window?.rootViewController = ViewController()
+            let mainPage = UIHostingController(rootView: MainPage())
+            navcontroller.setViewControllers([mainPage], animated: true)
+            window?.rootViewController = navcontroller
         }
         
         window?.makeKeyAndVisible()

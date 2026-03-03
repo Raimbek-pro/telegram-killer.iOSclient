@@ -19,13 +19,18 @@ final class router {
     
     func movetoconf() {
         
-        navcontroller.pushViewController(UIHostingController(rootView: ConfirmationView()), animated: true)
+        navcontroller.pushViewController(UIHostingController(rootView: ConfirmationView(router: self)), animated: true)
 
         
     }
     
     func movetomainPage() {
-        navcontroller.pushViewController(UIHostingController(rootView: MainPage()), animated: true)
+ 
+    
+        
+    
+        navcontroller.setViewControllers([UIHostingController(rootView: MainPage())] , animated: true)
+ 
     }
     
 }
