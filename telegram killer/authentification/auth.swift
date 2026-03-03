@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct Auth: View {
+struct AuthView: View {
     
     @StateObject var viewModel : authVM
     

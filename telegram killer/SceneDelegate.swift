@@ -21,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: windowScene)
         let navcontroller = UINavigationController()
         let router = router(navcontroller: navcontroller)
-        let authview = UIHostingController(rootView: Auth(router: router) )
+        let authview = UIHostingController(rootView: AuthView(router: router) )
        //move to folder
         
         
