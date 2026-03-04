@@ -14,6 +14,6 @@ struct emailreq :Codable {
 nonisolated
 struct signUpResp : Codable {
   //  let userId : String
-    let registeredAt : String
+    let registeredAt : String?
     let message : String
 }

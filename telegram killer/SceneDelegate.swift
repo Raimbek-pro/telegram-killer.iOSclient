@@ -33,9 +33,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             
         }
         else{
-            let mainPage = UIHostingController(rootView: MainPage())
-            navcontroller.setViewControllers([mainPage], animated: true)
-            window?.rootViewController = navcontroller
+
+            router.movetomainPage()
+            window?.rootViewController = router.navcontroller
         }
         
         window?.makeKeyAndVisible()

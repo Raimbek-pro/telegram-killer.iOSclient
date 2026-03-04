@@ -11,6 +11,7 @@ struct AuthView: View {
     
     @StateObject var viewModel : authVM
     
+    @State var textWarn = ""
     init(router :  router ){
         self._viewModel = StateObject(wrappedValue: authVM(router: router))
     }
@@ -20,7 +21,7 @@ struct AuthView: View {
         
        buttonSend
         
-        
+       textWarnView
     }
     
     var textfield : some View {
@@ -41,10 +42,22 @@ struct AuthView: View {
                 do{
                    try await viewModel.sendemail(email: email)
                     UserDefaults().set(email, forKey: "email")
+                    textWarn = ""
                     viewModel.navigate()
                 }
                 catch{
-                    print("error")
+                    print(error)
+                    if error.localizedDescription == "409"{
+                        UserDefaults().set(email, forKey: "email")
+                    
+                        try? await viewModel.sendLogEmail(email:  email)
+                        textWarn = ""
+                        viewModel.navigate()
+                    }
+                    else{
+                        textWarn = "OOOOPS BRO/SIS \(error.localizedDescription)"
+                    }
+                   
                 }
              
                 
@@ -59,6 +72,13 @@ struct AuthView: View {
         .buttonStyle(.glassProminent)
         
         .padding(20)
+    }
+    
+    var textWarnView : some View {
+        
+        
+        Text(textWarn)
+            .padding(10)
     }
 }
 

@@ -11,6 +11,8 @@ struct ConfirmationView: View {
     @StateObject var viewmodel : ConfirmationVM
     @State var confcode = ""
    
+    @State var textWarn = ""
+    
     init(router : router){
         self._viewmodel = StateObject(wrappedValue:
         ConfirmationVM(routerConf: router)
@@ -42,7 +44,8 @@ struct ConfirmationView: View {
                     viewmodel.navigateMain()
                 }
                 catch{
-                    print("not able ")
+                    print(error)
+                    textWarn = ("whoah whoah \(error.localizedDescription)")
                 }
                
             }
