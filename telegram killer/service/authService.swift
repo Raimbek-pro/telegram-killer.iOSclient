@@ -8,171 +8,160 @@
 import Foundation
 
 import Combine
-class authService : ObservableObject {
-    
-    
-    func sendLogEmail(_ email : String) async throws {
-        UserDefaults.standard.set("http://localhost:8080", forKey: "server")
-        guard let serv = UserDefaults.standard.string(forKey: "server") else {return }
-        
-        let endpoint = URL(string: "\(serv)/api/account/signin" )
-        var request = URLRequest(url: endpoint!)
-        let emailreq = emailreq(email:email )
-        guard let body = try? JSONEncoder().encode(emailreq) else{ return }
 
+enum servConf : String {
+    
+    case server = "http://localhost:8080"
+    
+    
+    static var baseURL  : String{
+        servConf.server.rawValue
+    }
+    
+}
+
+
+enum codeError : Error {
+    
+    case conflict
+    case internalServer
+    case badRequest
+    case notFound
+    case unknown(Int)
+}
+
+enum  endpointConf {
+    
+    static func confReq(codable : Codable? , endpoint : URL , accessToken : String? = nil )  async   throws -> (Data, Int) {
+        
+        var request = URLRequest(url: endpoint)
+        if let codable = codable {
+            guard let body = try? JSONEncoder().encode(codable) else{ throw   codeError.badRequest}
+            request.httpBody = body
+        }
+        
+        
         request.setValue("application/json", forHTTPHeaderField: "Content-type")
        
         request.httpMethod = "POST"
+    
+        if let accessToken = accessToken {
+            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        }
         
-        request.httpBody = body
         
+        let (data , response ) = try await URLSession.shared.data(for: request)
+    
+
+    
+    guard let response  = response as? HTTPURLResponse else {
+        throw URLError(.badServerResponse)
+        }
+        
+        return (data, response.statusCode)
+    }
+}
+
+
+class authService : ObservableObject {
+    
+   
+    func sendLogEmail(_ email : String) async throws {
       
-            let (data , response ) = try await URLSession.shared.data(for: request)
         
+        let endpoint = URL(string: "\(servConf.baseURL)/api/account/signin" )
+        let emailreq = emailreq(email:email )
+        let (data , responseCode ) = try await endpointConf.confReq(codable: emailreq, endpoint: endpoint!)
+    
 
         
-        guard let response  = response as? HTTPURLResponse else {
-            throw URLError(.badServerResponse)
-            }
+        switch responseCode {
             
+        case 200 :
+            let _ = try JSONDecoder().decode(signUpResp.self, from: data)
+            
+        case 409 :
+            throw codeError.conflict
+            
+        case 500 :
+            throw codeError.internalServer
+            
+        case 400 :
+            throw codeError.badRequest
+            
+        default :
+            throw  codeError.unknown(responseCode)
+        }
              
            
             
-            if response.statusCode == 200 {
-                let _ = try JSONDecoder().decode(signUpResp.self, from: data)
-               
-            }
-            else{
-                
-                if response.statusCode == 409 {
-                    throw NSError(domain: "httperror", code: 409, userInfo: [NSLocalizedDescriptionKey: "409"] )
-                }
-                else if response.statusCode == 500 {
-                    throw  NSError(domain: "internalError", code: 500 , userInfo: [NSLocalizedDescriptionKey: "Problems with server"])
-                }
-                else if response.statusCode == 400{
-                    throw NSError(domain: "badReques", code: 400, userInfo: [NSLocalizedDescriptionKey: "Bad request. Please check your input."])
-                }
-                
-            }
+    
             
-            return
+           
         
      
     }
     func sendEmail(_ email : String) async  throws {
-        UserDefaults.standard.set("http://localhost:8080", forKey: "server")
-        guard let serv = UserDefaults.standard.string(forKey: "server") else {return }
+ 
         
-        let endpoint = URL(string: "\(serv)/api/account/signup" )
-        var request = URLRequest(url: endpoint!)
+        let endpoint = URL(string: "\(servConf.baseURL)/api/account/signup" )
         let emailreq = emailreq(email:email )
-        guard let body = try? JSONEncoder().encode(emailreq) else{ return }
-
-        request.setValue("application/json", forHTTPHeaderField: "Content-type")
-       
-        request.httpMethod = "POST"
-        
-        request.httpBody = body
-        
-      
-            let (data , response ) = try await URLSession.shared.data(for: request)
-        
-
-        
-        guard let response  = response as? HTTPURLResponse else {
-            throw URLError(.badServerResponse)
-            }
+      let ( data , responseCode ) = try await  endpointConf.confReq(codable: emailreq, endpoint: endpoint!)
             
              
-           
+        switch responseCode {
             
-            if response.statusCode == 200 {
-                let _ = try JSONDecoder().decode(signUpResp.self, from: data)
-               
-            }
-            else{
-                
-                if response.statusCode == 409 {
-                    throw NSError(domain: "httperror", code: 409, userInfo: [NSLocalizedDescriptionKey: "409"] )
-                }
-                else if response.statusCode == 500 {
-                    throw  NSError(domain: "internalError", code: 500 , userInfo: [NSLocalizedDescriptionKey: "Problems with server"])
-                }
-                else if response.statusCode == 400{
-                    throw NSError(domain: "badReques", code: 400, userInfo: [NSLocalizedDescriptionKey: "Bad request. Please check your input."])
-                }
-                
-            }
+        case 200 :
+            let _ = try JSONDecoder().decode(signUpResp.self, from: data)
             
-            return
+        case 409 :
+            throw codeError.conflict
+            
+        case 500 :
+            throw codeError.internalServer
+            
+        case 400 :
+            throw codeError.badRequest
+            
+        default :
+            throw  codeError.unknown(responseCode)
+        }
+        
+        }
+            
+         
         
      
         
-    }
+    
     
     
     func sendConf( email : String  , confCode : String ) async throws {
         
-        guard let serv = UserDefaults.standard.string(forKey: "server") else {return }
-        guard  let endpoint = URL(string: "\(serv)/api/account/email/confirm") else {return}
-        
-        var request = URLRequest(url: endpoint)
-        
-        request.setValue("application/json", forHTTPHeaderField: "Content-type")
-        request.httpMethod = "POST"
+     
+        guard  let endpoint = URL(string: "\(servConf.baseURL)/api/account/email/confirm") else {return}
         let reqbody = confirmReq(email: email, confirmationCode: confCode)
-        guard let body = try? JSONEncoder().encode(reqbody) else {return}
         
-        request.httpBody = body
+       let (data , responseCode ) =  try await endpointConf.confReq(codable: reqbody, endpoint: endpoint)
         
-        let (data , response ) = try await URLSession.shared.data(for: request)
-        
-        
-        guard let response =  response as? HTTPURLResponse else {return}
-        
-            if response.statusCode == 200{
-              
-                
-                UserDefaults.standard.set(1, forKey: "isAuthorized")
-                
-                let tokenresp =  try JSONDecoder().decode(tokens.self, from: data)
-                //refresh
-                let queryrefresh  = [kSecValueData :tokenresp.refreshToken.data(using: .utf8) as Any,
-                                   kSecAttrAccount : "refreshToken",
-                                          kSecClass:kSecClassGenericPassword
-                                     
-                ]   as CFDictionary
-                
-                let statusref = SecItemAdd(queryrefresh , nil)
-                
-                print(statusref)
-                
-                //access token in keychain
-                
-                let queryaccess = [     kSecValueData :tokenresp.accessToken.data(using: .utf8) as Any,
-                                      kSecAttrAccount : "accessToken",
-                                             kSecClass:kSecClassGenericPassword
-                                        
-                                        
-                ]   as CFDictionary
-                
-                let statusacc = SecItemAdd(queryaccess , nil)
-                
-                print(statusacc)
-            }
-            else{
-                if response.statusCode == 400 {
-                    throw NSError(domain: "httperror", code: 409, userInfo: [NSLocalizedDescriptionKey: "you messed up it is not that code"] )
-                }
-                else if response.statusCode == 500 {
-                    throw  NSError(domain: "internalError", code: 500 , userInfo: [NSLocalizedDescriptionKey: "Problems with server"])
-                }
-                else if response.statusCode == 404 {
-                    throw  NSError(domain: "notFound", code: 404 , userInfo: [NSLocalizedDescriptionKey: "something strange happened"])
-                }
-               
-            }
+        switch responseCode {
+        case 200 :
+            UserDefaults.standard.set(1, forKey: "isAuthorized")
+            
+            let tokenresp =  try JSONDecoder().decode(tokens.self, from: data)
+            
+           try keychainService.writeTokens(tokens: tokenresp)
+        case 400 :
+            throw codeError.badRequest
+        case 500 :
+            throw codeError.internalServer
+            
+        case 404 :
+            throw codeError.notFound
+        default :
+            throw codeError.unknown(responseCode)
+            
+        }
             
         
 
@@ -183,124 +172,66 @@ class authService : ObservableObject {
     
     
     func sendLogOut() async throws {
-        UserDefaults.standard.set("http://localhost:8080", forKey: "server")
-        guard let serv = UserDefaults.standard.string(forKey: "server") else {return }
+
         
-        let endpoint = URL(string: "\(serv)/api/account/logout" )
+        let endpoint = URL(string: "\(servConf.baseURL)/api/account/logout" )
         
+        
+      
         var request = URLRequest(url: endpoint!)
         
+        var reftoken = keychainService.getRefreshToken()
+        var accesstoken = keychainService.getAccessToken()
         
-        let queryref = [
-            kSecAttrAccount : "refreshToken",
-            kSecClass:kSecClassGenericPassword,
-            kSecReturnData: true,
-            kSecMatchLimit: kSecMatchLimitOne
+        let tokenCodable = refsend(refreshToken: reftoken)
+        
+        let (data , responseCode) =  try await endpointConf.confReq(codable: tokenCodable, endpoint: endpoint! , accessToken: accesstoken)
+        
+        switch responseCode {
             
-        ] as CFDictionary
-        
-        
-        var item: CFTypeRef?
-        let status = SecItemCopyMatching(queryref , &item)
-        
-        
-        
-        var reftoken = ""
-        
-        if status == errSecSuccess , let passwordData = item as? Data {
-            let ref = String(decoding : passwordData , as :  UTF8.self)
-            reftoken = ref
-            print(reftoken)
+        case 204 :
+            try   keychainService.deleteTokens()
+            UserDefaults().removeObject(forKey: "isAuthorized")
+        default :
+            throw codeError.unknown(responseCode)
+            
+            
         }
+            
+       
+        
+        
+    }
+    
+    
+    func sendRefreshToken() async throws{
+  
+        
+        let endpoint = URL(string: "\(servConf.baseURL)/api/account/tokens/refresh" )
+        
+     
+        
+        var reftoken =  keychainService.getRefreshToken()
+        
+        
         
         let tokenCodable = refsend(refreshToken: reftoken)
         
         
-        guard let body = try? JSONEncoder().encode(tokenCodable) else{ return }
+        let (data , responseCode) = try await endpointConf.confReq(codable: tokenCodable, endpoint: endpoint!)
         
-        let queryacc = [
-            kSecAttrAccount : "accessToken",
-            kSecClass:kSecClassGenericPassword,
-            kSecReturnData: true,
-            kSecMatchLimit: kSecMatchLimitOne
+        switch responseCode {
             
-        ] as CFDictionary
-        
-        
-        var itemacc: CFTypeRef?
-        let statusacc = SecItemCopyMatching(queryacc , &itemacc)
-        
-        
-        var accesstoken = ""
-        
-        
-        if statusacc == errSecSuccess , let passwordData = itemacc as? Data {
-            let acc = String(decoding : passwordData , as :  UTF8.self)
-            accesstoken = acc
-            print(accesstoken)
+        case 200 :
+            let tokenresp =  try JSONDecoder().decode(tokens.self, from: data)
+            try keychainService.updateTokens(tokens: tokenresp)
+            
+        default :
+            
+            throw codeError.unknown(responseCode)
         }
         
-        request.setValue("application/json", forHTTPHeaderField: "Content-type")
-       
-        request.httpMethod = "POST"
-        
-        request.httpBody = body
-        
-               request.setValue("Bearer \(accesstoken)", forHTTPHeaderField: "Authorization")
-        print("---- REQUEST ----")
-        print("URL:", request.url?.absoluteString ?? "")
-        print("Method:", request.httpMethod ?? "")
-        print("Headers:", request.allHTTPHeaderFields ?? [:])
-
-        if let body = request.httpBody,
-           let bodyString = String(data: body, encoding: .utf8) {
-            print("Body:", bodyString)
-        }
-        print("-----------------")
-        
-        let (_ , response ) = try await URLSession.shared.data(for: request)
-        
-        
-        guard let response  = response as? HTTPURLResponse else {
-            throw URLError(.badServerResponse)
-            }
-            
-        if response.statusCode == 204 {
-            
-            let querydel = [
-                kSecAttrAccount : "refreshToken",
-                kSecClass:kSecClassGenericPassword,
-            
-                
-            ] as CFDictionary
-            
-            
-            let statusdel = SecItemDelete(querydel)
-            print(statusdel)
-            let querydelacc = [
-                kSecAttrAccount : "accessToken",
-                kSecClass:kSecClassGenericPassword,
-            
-                
-            ] as CFDictionary
-            
-            let statusdelacc = SecItemDelete(querydelacc)
-            print(statusdelacc)
-            
-            UserDefaults().removeObject(forKey: "isAuthorized")
-        
-            
-            
-            
-        }
-        else{
-            if response.statusCode == 400{
-                throw NSError(domain: "400", code: 400)
-            }
-            else{
-                throw NSError(domain: "403", code: 403)
-            }
-        }
+      
         
         
     }

@@ -36,32 +36,31 @@ struct AuthView: View {
     var buttonSend : some View {
         
         Button(action: {
-
+            
             Task{
                 print("sending email")
                 do{
-                   try await viewModel.sendemail(email: email)
+                    try await viewModel.sendemail(email: email)
                     UserDefaults().set(email, forKey: "email")
                     textWarn = ""
                     viewModel.navigate()
                 }
-                catch{
-                    print(error)
-                    if error.localizedDescription == "409"{
-                        UserDefaults().set(email, forKey: "email")
+                catch codeError.conflict{
+                    UserDefaults().set(email, forKey: "email")
                     
-                        try? await viewModel.sendLogEmail(email:  email)
-                        textWarn = ""
-                        viewModel.navigate()
-                    }
-                    else{
-                        textWarn = "OOOOPS BRO/SIS \(error.localizedDescription)"
-                    }
-                   
+                    try? await viewModel.sendLogEmail(email:  email)
+                    textWarn = ""
+                    viewModel.navigate()
+                    
+                } catch{
+                    textWarn = "OOOOPS BRO/SIS \(error.localizedDescription)"
                 }
-             
+                
                 
             }
+        
+                
+            
 
             
            
