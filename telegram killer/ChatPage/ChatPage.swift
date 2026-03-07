@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MainPage: View {
+struct ChatPage: View {
     var body: some View {
         Text("main page")
     }
@@ -15,5 +15,5 @@ struct MainPage: View {
 }
 
 #Preview {
-    MainPage()
+    ChatPage()
 }
