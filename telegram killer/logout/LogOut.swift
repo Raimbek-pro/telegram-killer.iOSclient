@@ -24,16 +24,14 @@ struct LogOut: View {
     
     var logout : some View {
         Button("log out", action: {
-            Task{
-                do {
-                    try await viewmodel.sendLogout()
-                    textWarn = ""
-                    viewmodel.moveToLogIn()
-                }
-                catch{
-                    textWarn = ("oops , \(error.localizedDescription)")
-                }
-                            }
+            Task {
+                
+                 await viewmodel.sendLogout()
+               
+                
+            }
+                
+                            
             
         })
     }

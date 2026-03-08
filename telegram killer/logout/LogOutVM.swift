@@ -17,8 +17,26 @@ class LogOutVM : ObservableObject {
         self.router = router
     }
     
-    func sendLogout() async throws {
-       try await authServ.sendLogOut()
+    func sendLogout() async  {
+        do{
+            try await authServ.sendLogOut()
+            self.moveToLogIn()
+        }
+        catch{
+            do {
+                try await authServ.sendRefreshToken()
+                
+                try await authServ.sendLogOut()
+                self.moveToLogIn()
+            } catch{
+                try? keychainService.deleteTokens()
+                      UserDefaults().removeObject(forKey: "isAuthorized")
+                      self.moveToLogIn()
+            }
+    
+            
+        }
+      
     }
     
     func moveToLogIn() {

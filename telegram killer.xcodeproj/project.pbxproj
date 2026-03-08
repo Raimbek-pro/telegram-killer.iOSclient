@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		63F5FF3E2F5B63780061F596 /* SignalRClient in Frameworks */ = {isa = PBXBuildFile; productRef = 63F5FF3D2F5B63780061F596 /* SignalRClient */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		635C2E542F33A282003DBC2E /* telegram killer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "telegram killer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -29,6 +33,11 @@
 			path = "telegram killer";
 			sourceTree = "<group>";
 		};
+		63F5FF3F2F5B63AD0061F596 /* chathub */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = chathub;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,6 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63F5FF3E2F5B63780061F596 /* SignalRClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,6 +57,7 @@
 			children = (
 				635C2E562F33A282003DBC2E /* telegram killer */,
 				635C2E552F33A282003DBC2E /* Products */,
+				63F5FF3F2F5B63AD0061F596 /* chathub */,
 			);
 			sourceTree = "<group>";
 		};
@@ -75,9 +86,11 @@
 			);
 			fileSystemSynchronizedGroups = (
 				635C2E562F33A282003DBC2E /* telegram killer */,
+				63F5FF3F2F5B63AD0061F596 /* chathub */,
 			);
 			name = "telegram killer";
 			packageProductDependencies = (
+				63F5FF3D2F5B63780061F596 /* SignalRClient */,
 			);
 			productName = "telegram killer";
 			productReference = 635C2E542F33A282003DBC2E /* telegram killer.app */;
@@ -107,6 +120,9 @@
 			);
 			mainGroup = 635C2E4B2F33A282003DBC2E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				63F5FF3C2F5B63780061F596 /* XCRemoteSwiftPackageReference "signalr-client-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 635C2E552F33A282003DBC2E /* Products */;
 			projectDirPath = "";
@@ -343,6 +359,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		63F5FF3C2F5B63780061F596 /* XCRemoteSwiftPackageReference "signalr-client-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/dotnet/signalr-client-swift";
+			requirement = {
+				branch = dev;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		63F5FF3D2F5B63780061F596 /* SignalRClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 63F5FF3C2F5B63780061F596 /* XCRemoteSwiftPackageReference "signalr-client-swift" */;
+			productName = SignalRClient;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 635C2E4C2F33A282003DBC2E /* Project object */;
 }

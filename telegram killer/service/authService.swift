@@ -25,6 +25,7 @@ enum codeError : Error {
     
     case conflict
     case internalServer
+    case unauthorized
     case badRequest
     case notFound
     case unknown(Int)
@@ -226,6 +227,10 @@ class authService : ObservableObject {
             let tokenresp =  try JSONDecoder().decode(tokens.self, from: data)
             try keychainService.updateTokens(tokens: tokenresp)
             
+            
+        case 401 :
+            
+            throw codeError.unauthorized
         default :
             
             throw codeError.unknown(responseCode)
