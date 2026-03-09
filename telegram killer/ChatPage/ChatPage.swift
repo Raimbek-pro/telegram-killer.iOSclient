@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ChatPage: View {
     
-    
+  
     @StateObject var  viewModel : ChatPageVM
     @State var email = ""
     @State var message = ""
@@ -37,7 +37,32 @@ struct ChatPage: View {
             ScrollView{
                 LazyVStack{
                     ForEach(viewModel.messages, id : \.self){ mes in
-                        Text(mes)
+                        if mes.fromMe {
+                            HStack{
+                                Spacer()
+                                Text(mes.message)
+                                    .frame(minWidth: 20,  alignment: .leading)
+                                
+                                    .padding()
+                                    .background(.cyan)
+                                    .clipShape(.capsule)
+                                
+                            }
+                         
+                        }
+                        else {
+                            HStack{
+                                Text(mes.message)
+                                    .frame(minWidth: 20, alignment: .leading)
+                                    .padding(20)
+                                    .background(.green)
+                                    .clipShape(.capsule)
+                                Spacer()
+                            }
+                            
+                                
+                        }
+                            
                     }
                 }
             }
@@ -76,9 +101,11 @@ extension ChatPage {
             Task {
                 do {
                     viewModel.id =  try await viewModel.getId(to: email)
-                    showButton.toggle()
+                    showButton = true
                 } catch ErrorChat.NotFound{
+                    showButton = false
                     warn = "Email not found "
+                   
                 }
                 
             }
@@ -96,13 +123,16 @@ extension ChatPage {
                 Task{
                     await  viewModel.sendMessage(to: viewModel.id, message: message)
                 
-                    
+                    viewModel.messages.append(Message(message: message, fromMe: true))
                 }
 
             }
           
         }, label: {
-            Text(Image(systemName: "paperplane"))
+             Image(systemName: "paperplane")
+            
+
+                .foregroundStyle(.white)
                 .padding()
                 .background(showButton ? .blue : .gray )
                 .glassEffect()

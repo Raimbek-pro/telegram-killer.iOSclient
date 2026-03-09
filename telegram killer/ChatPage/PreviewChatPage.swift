@@ -14,7 +14,9 @@ extension ChatPageVM {
     static func preview() -> ChatPageVM {
         
         let vm = ChatPageVM(chatHub: chatHub(), router: router(navcontroller: UINavigationController()) )
-        vm.messages = ["Hello", "How are you?", "Test message"]
+        vm.messages = [Message(message: "OMG I HAVE SMTH TO TELL", fromMe: true),
+                       Message(message:"what" , fromMe:  false),
+                       Message(message: "I am pregnant!" , fromMe:  true)]
         return vm
 
     }

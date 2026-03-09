@@ -12,3 +12,10 @@ struct UserId : Codable {
     
     let email : String
 }
+
+
+struct Message : Hashable {
+    
+    let message : String
+    let fromMe : Bool 
+}

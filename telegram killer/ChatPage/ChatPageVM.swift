@@ -14,7 +14,7 @@ class ChatPageVM : ObservableObject {
     var routerChat : router
     var authServ : authService = authService()
     
-    @Published var messages: [String] = []
+    @Published var messages: [Message ] = []
     
     
     var id = ""
@@ -65,7 +65,8 @@ class ChatPageVM : ObservableObject {
         try await self.hub.startConnection()
         
         for await message in self.hub.messageStream {
-            self.messages.append(message)
+            // false represents that message is not mine
+            self.messages.append(Message(message: message, fromMe: false))
         }
     }
     
