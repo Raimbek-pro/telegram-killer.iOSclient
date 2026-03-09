@@ -14,6 +14,11 @@ class ChatPageVM : ObservableObject {
     var router : router
     var authServ : authService = authService()
     
+    
+    var id = ""
+    
+    let chatServ : ChatService = ChatService()
+    
     init(chatHub: chatHub,router : router) {
         self.chatHub = chatHub
         self.router = router
@@ -34,12 +39,17 @@ class ChatPageVM : ObservableObject {
                 
                 try await self.chatHub.startConnection()
             }
-            catch{
+            catch codeError.unauthorized {
                 print("❌ retry failed: \(error)")
                 try? keychainService.deleteTokens()
                       UserDefaults().removeObject(forKey: "isAuthorized")
                       router.movetoLogIn()
             }
+            catch{
+                
+            }
+            
+            
         
             
         }
@@ -50,7 +60,7 @@ class ChatPageVM : ObservableObject {
     func sendMessage(to: String, message: String) async  {
         
         do{
-            try await  self.chatHub.sendMessage(to: to, message: message)
+            try await  self.chatHub.sendMessage(to: id , message: message)
         } catch {
             do{
                 try await authServ.sendRefreshToken()
@@ -66,7 +76,24 @@ class ChatPageVM : ObservableObject {
      
     }
     
+    func getId(to : String) async throws -> String {
+        
+        do{
+           let id =  try await self.chatServ.accountId(email: to )
+            return id
+        } catch{
+            throw ErrorChat.NotFound
+        }
+        
+
+    }
+    
 
     
     
+}
+
+
+enum ErrorChat  : Error {
+    case NotFound
 }

@@ -13,7 +13,8 @@ struct ChatPage: View {
     @StateObject var  viewModel : ChatPageVM
     @State var email = ""
     @State var message = ""
-    
+    @State var warn =  ""
+    @State var showButton = false
     init(router :  router , chathub : chatHub ){
         self._viewModel = StateObject(wrappedValue: ChatPageVM(chatHub:  chathub , router: router))
     }
@@ -22,10 +23,17 @@ struct ChatPage: View {
         
         
         VStack{
-            HStack{
-                TextField("Send to email", text: $email)
+            VStack{
+                HStack{
+                    TextField("Send to email", text: $email)
+                    findEmail
+                }
+                .padding(30)
+                
+                Text(warn)
             }
-            .padding(30)
+            
+         
             ScrollView{
                 LazyVStack{
                     ForEach(1...100, id : \.self){ num in
@@ -62,18 +70,41 @@ struct ChatPage: View {
 
 extension ChatPage {
     
+    var findEmail : some View{
+        
+        Button(action: {
+            Task {
+                do {
+                    viewModel.id =  try await viewModel.getId(to: email)
+                    showButton.toggle()
+                } catch ErrorChat.NotFound{
+                    warn = "Email not found "
+                }
+                
+            }
+        }, label: {
+            Text(Image(systemName: "magnifyingglass"))
+                .padding()
+                .glassEffect()
+                .clipShape(.circle)
+        })
+    }
     var sendMessage : some View {
         
         Button(action: {
-            Task{
-                    await  viewModel.sendMessage(to: email, message: message)
-            
+            if showButton {
+                Task{
+                    await  viewModel.sendMessage(to: viewModel.id, message: message)
                 
+                    
+                }
+
             }
           
         }, label: {
             Text(Image(systemName: "paperplane"))
                 .padding()
+                .background(showButton ? .blue : .gray )
                 .glassEffect()
                 .clipShape(.circle)
                
