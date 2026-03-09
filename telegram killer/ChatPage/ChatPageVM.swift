@@ -10,8 +10,8 @@ import Combine
 
 class ChatPageVM : ObservableObject {
     
-    var chatHub : chatHub
-    var router : router
+    var hub: chatHub
+    var routerChat : router
     var authServ : authService = authService()
     
     @Published var messages: [String] = []
@@ -22,8 +22,8 @@ class ChatPageVM : ObservableObject {
     let chatServ : ChatService = ChatService()
     
     init(chatHub: chatHub,router : router) {
-        self.chatHub = chatHub
-        self.router = router
+        self.hub = chatHub
+        self.routerChat = router
     }
     
     func startConnection() async   {
@@ -45,7 +45,7 @@ class ChatPageVM : ObservableObject {
                 print("❌ retry failed: \(error)")
                 try? keychainService.deleteTokens()
                       UserDefaults().removeObject(forKey: "isAuthorized")
-                      router.movetoLogIn()
+                      routerChat.movetoLogIn()
             }
             catch{
                 
@@ -62,9 +62,9 @@ class ChatPageVM : ObservableObject {
     
     func startConnectionMessage() async throws {
         
-        try await self.chatHub.startConnection()
+        try await self.hub.startConnection()
         
-        for await message in self.chatHub.messageStream {
+        for await message in self.hub.messageStream {
             self.messages.append(message)
         }
     }
@@ -73,16 +73,16 @@ class ChatPageVM : ObservableObject {
     func sendMessage(to: String, message: String) async  {
         
         do{
-            try await  self.chatHub.sendMessage(to: id , message: message)
+            try await  self.hub.sendMessage(to: id , message: message)
         } catch {
             do{
                 try await authServ.sendRefreshToken()
                 
-                try await  self.chatHub.sendMessage(to: id, message: message)
+                try await  self.hub.sendMessage(to: id, message: message)
             } catch {
                 try? keychainService.deleteTokens()
                       UserDefaults().removeObject(forKey: "isAuthorized")
-                      router.movetoLogIn()
+                      routerChat.movetoLogIn()
             }
            
         }
@@ -110,3 +110,6 @@ class ChatPageVM : ObservableObject {
 enum ErrorChat  : Error {
     case NotFound
 }
+
+
+

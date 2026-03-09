@@ -15,8 +15,8 @@ struct ChatPage: View {
     @State var message = ""
     @State var warn =  ""
     @State var showButton = false
-    init(router :  router , chathub : chatHub ){
-        self._viewModel = StateObject(wrappedValue: ChatPageVM(chatHub:  chathub , router: router))
+    init(ChatPageVM : ChatPageVM ){
+        self._viewModel = StateObject(wrappedValue: ChatPageVM)
     }
     
     var body: some View {
@@ -118,4 +118,8 @@ extension ChatPage {
         
       
     }
+}
+
+#Preview {
+    ChatPage(ChatPageVM: ChatPageVM.preview())
 }

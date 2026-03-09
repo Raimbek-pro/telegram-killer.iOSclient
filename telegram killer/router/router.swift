@@ -26,7 +26,7 @@ final class router {
     
     func movetomainPage() {
  
-        let   mainpage_Tab = UIHostingController(rootView: ChatPage(router: self, chathub: chatHub()))
+        let   mainpage_Tab = UIHostingController(rootView: ChatPage(ChatPageVM : ChatPageVM(chatHub: chatHub(), router: self)))
         
         let account_Tab = UIHostingController(rootView: LogOut(router: self))
         
