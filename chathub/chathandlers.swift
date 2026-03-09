@@ -11,16 +11,19 @@ import SignalRClient
 
 
 
-class chatHub {
+import Foundation
+
+class chatHub   {
     
+
     var connection : HubConnection
     
     init() {
         
-      var  options = HttpConnectionOptions()
+        var  options = HttpConnectionOptions()
         
-       options.accessTokenFactory = {
-           return await keychainService.getAccessToken()
+        options.accessTokenFactory = {
+            return await keychainService.getAccessToken()
         }
         
         self.connection = HubConnectionBuilder()
@@ -31,9 +34,9 @@ class chatHub {
     func startConnection() async  throws{
         
         await connection.stop()
-       
-          
-        await receiveMessage()
+        
+        
+        
         
         
         
@@ -48,21 +51,26 @@ class chatHub {
         
     }
     
-    func receiveMessage() async  {
-        print("try catching")
-        await connection.on("ReceiveMessage"){ (to : String ,  message : String ) in
-            print("to \(to ) sending \(message)")
+    
+    
+    
+    var messageStream : AsyncStream<String> {
+        AsyncStream { continuation in
             
+            Task {
+                await connection.on("ReceiveMessage"){ (to : String ,  message : String ) in
+                    print("to \(to ) sending \(message)")
+                    continuation.yield(message)
+                }
+                
+            }
         }
         
-    }
         
-        
-
         
         
     }
-    
+}
     
    
 

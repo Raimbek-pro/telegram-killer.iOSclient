@@ -36,8 +36,8 @@ struct ChatPage: View {
          
             ScrollView{
                 LazyVStack{
-                    ForEach(1...100, id : \.self){ num in
-                        Text(String(num))
+                    ForEach(viewModel.messages, id : \.self){ mes in
+                        Text(mes)
                     }
                 }
             }

@@ -10,9 +10,11 @@ import Combine
 
 class ChatPageVM : ObservableObject {
     
-    let chatHub : chatHub
+    var chatHub : chatHub
     var router : router
     var authServ : authService = authService()
+    
+    @Published var messages: [String] = []
     
     
     var id = ""
@@ -28,7 +30,7 @@ class ChatPageVM : ObservableObject {
         
         do{
         
-            try await self.chatHub.startConnection()
+            try await self.startConnectionMessage()
         }
         catch{
             print("❌ \(error)")
@@ -37,7 +39,7 @@ class ChatPageVM : ObservableObject {
                 
                 try await authServ.sendRefreshToken()
                 
-                try await self.chatHub.startConnection()
+                try await self.startConnectionMessage()
             }
             catch codeError.unauthorized {
                 print("❌ retry failed: \(error)")
@@ -57,6 +59,17 @@ class ChatPageVM : ObservableObject {
       
     }
     
+    
+    func startConnectionMessage() async throws {
+        
+        try await self.chatHub.startConnection()
+        
+        for await message in self.chatHub.messageStream {
+            self.messages.append(message)
+        }
+    }
+    
+    
     func sendMessage(to: String, message: String) async  {
         
         do{
@@ -65,7 +78,7 @@ class ChatPageVM : ObservableObject {
             do{
                 try await authServ.sendRefreshToken()
                 
-                try await  self.chatHub.sendMessage(to: to, message: message)
+                try await  self.chatHub.sendMessage(to: id, message: message)
             } catch {
                 try? keychainService.deleteTokens()
                       UserDefaults().removeObject(forKey: "isAuthorized")
