@@ -47,6 +47,44 @@ class ChatService : ObservableObject {
         }
         
     }
+    
+    
+    func createChat(id : String ) async throws -> UsersChat {
+        let endpoint = URL(string : "\(servConf.baseURL)/api/chat")!
+        let accessToken = keychainService.getAccessToken()
+        let codable = otherUserId(otherUserId: id )
+        let (data , responseCode ) =   try  await  endpointConf.confReq( codable: codable ,endpoint: endpoint ,accessToken:  accessToken  )
+        
+        switch responseCode {
+        case 200:
+            let decoded = try JSONDecoder().decode(UsersChat.self, from: data)
+            return decoded
+        
+        default :
+            throw codeError.unknown(responseCode)
+        
+        }
+    }
+    
+    
+    func getMessages( chatId :String) async throws -> Messages {
+        
+
+        let endpoint = URL(string: "\(servConf.baseURL)/api/chat?chatId=\(chatId)" )!
+        let accessToken = keychainService.getAccessToken()
+        let (data , responseCode ) =   try  await  endpointConf.confReq( endpoint: endpoint ,accessToken:  accessToken , httpMethod:  "GET" )
+        
+        switch responseCode {
+            
+        case 200 :
+            let decoded = try JSONDecoder().decode(Messages.self, from: data)
+            return decoded
+            
+        default :
+            throw codeError.unknown(responseCode)
+        }
+        
+    }
 
     
     

@@ -13,8 +13,8 @@ struct ChatPage: View {
     @StateObject var  viewModel : ChatPageVM
     @State var email = ""
     @State var message = ""
-    @State var warn =  ""
-    @State var showButton = false
+
+
     init(ChatPageVM : ChatPageVM ){
         self._viewModel = StateObject(wrappedValue: ChatPageVM)
     }
@@ -24,13 +24,12 @@ struct ChatPage: View {
         
         VStack{
             VStack{
-                HStack{
-                    TextField("Send to email", text: $email)
-                    findEmail
-                }
-                .padding(30)
                 
-                Text(warn)
+                HStack{
+                    Text("User")
+                        .clipShape(.capsule)
+                        .glassEffect()
+                }
             }
             
          
@@ -95,38 +94,42 @@ struct ChatPage: View {
 
 extension ChatPage {
     
-    var findEmail : some View{
-        
-        Button(action: {
-            Task {
-                do {
-                    viewModel.id =  try await viewModel.getId(to: email)
-                    showButton = true
-                } catch ErrorChat.NotFound{
-                    showButton = false
-                    warn = "Email not found "
-                   
-                }
-                
-            }
-        }, label: {
-            Text(Image(systemName: "magnifyingglass"))
-                .padding()
-                .glassEffect()
-                .clipShape(.circle)
-        })
-    }
+//    var findEmail : some View{
+//        
+//        Button(action: {
+//            Task {
+//                do {
+//                    viewModel.id =  try await viewModel.getId(to: email)
+//                    showButton = true
+//                    warn = ""
+//                } catch ErrorChat.NotFound{
+//                    showButton = false
+//                    warn = "Email not found "
+//                   
+//                }
+//                
+//            }
+//        }, label: {
+//            Text(Image(systemName: "magnifyingglass"))
+//                .padding()
+//                .glassEffect()
+//                .clipShape(.circle)
+//        })
+//    }
     var sendMessage : some View {
         
         Button(action: {
-            if showButton {
+        
                 Task{
-                    await  viewModel.sendMessage(to: viewModel.id, message: message)
-                
-                    viewModel.messages.append(Message(message: message, fromMe: true))
+                    
+                        await  viewModel.sendMessage(to: viewModel.id, message: message)
+                    
+                        viewModel.messages.append(Message(message: message, fromMe: true))
+                    
+              
                 }
 
-            }
+            
           
         }, label: {
              Image(systemName: "paperplane")
@@ -134,7 +137,7 @@ extension ChatPage {
 
                 .foregroundStyle(.white)
                 .padding()
-                .background(showButton ? .blue : .gray )
+                .background(.blue )
                 .glassEffect()
                 .clipShape(.circle)
                

@@ -9,7 +9,8 @@ import Foundation
 import Combine
 
 class ChatPageVM : ObservableObject {
-    
+    var usersChat : UsersChat
+    var messagesHistory : Messages
     var hub: chatHub
     var routerChat : router
     var authServ : authService = authService()
@@ -21,9 +22,15 @@ class ChatPageVM : ObservableObject {
     
     let chatServ : ChatService = ChatService()
     
-    init(chatHub: chatHub,router : router) {
+    init(chatHub: chatHub,router : router, messages : Messages, usersChat : UsersChat) {
         self.hub = chatHub
+        
         self.routerChat = router
+        
+        self.messagesHistory = messages
+        
+        self.usersChat = usersChat
+        
     }
     
     func startConnection() async   {
@@ -48,7 +55,7 @@ class ChatPageVM : ObservableObject {
                       routerChat.movetoLogIn()
             }
             catch{
-                
+                print("no internet")
             }
             
             
@@ -80,27 +87,29 @@ class ChatPageVM : ObservableObject {
                 try await authServ.sendRefreshToken()
                 
                 try await  self.hub.sendMessage(to: id, message: message)
-            } catch {
+            } catch codeError.unauthorized {
                 try? keychainService.deleteTokens()
                       UserDefaults().removeObject(forKey: "isAuthorized")
                       routerChat.movetoLogIn()
+            } catch {
+                print("no internet")
             }
            
         }
      
     }
     
-    func getId(to : String) async throws -> String {
-        
-        do{
-           let id =  try await self.chatServ.accountId(email: to )
-            return id
-        } catch{
-            throw ErrorChat.NotFound
-        }
-        
-
-    }
+//    func getId(to : String) async throws -> String {
+//        
+//        do{
+//           let id =  try await self.chatServ.accountId(email: to )
+//            return id
+//        } catch{
+//            throw ErrorChat.NotFound
+//        }
+//        
+//
+//    }
     
 
     

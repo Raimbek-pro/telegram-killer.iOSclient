@@ -27,7 +27,6 @@ struct LogOut: View {
             Task {
                 
                  await viewmodel.sendLogout()
-               
                 
             }
                 

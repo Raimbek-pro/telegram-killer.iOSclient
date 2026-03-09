@@ -26,7 +26,7 @@ final class router {
     
     func movetomainPage() {
  
-        let   mainpage_Tab = UIHostingController(rootView: ChatPage(ChatPageVM : ChatPageVM(chatHub: chatHub(), router: self)))
+        let   mainpage_Tab = UIHostingController(rootView: MainPageView(viewModel: MainPageVM(routerChat: self )))
         
         let account_Tab = UIHostingController(rootView: LogOut(router: self))
         
@@ -44,5 +44,10 @@ final class router {
     func  movetoLogIn(){
         let authview = UIHostingController(rootView: AuthView(router: self) )
         navcontroller.setViewControllers([authview], animated: true)
+    }
+    
+    func movetoChat(messages : Messages , usersChat : UsersChat ) {
+        let vm = ChatPageVM(chatHub: chatHub(), router: self, messages: messages , usersChat: usersChat  )
+        navcontroller.pushViewController(UIHostingController(rootView: ChatPage(ChatPageVM : vm )), animated: true)
     }
 }
