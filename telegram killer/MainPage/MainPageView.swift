@@ -79,6 +79,8 @@ extension MainPageView {
               
                     warn = "Email not found "
                    
+                } catch {
+                    print(error.localizedDescription)
                 }
                 
             }

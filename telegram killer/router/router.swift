@@ -19,7 +19,7 @@ final class router {
     
     func movetoconf() {
         
-        navcontroller.pushViewController(UIHostingController(rootView: ConfirmationView(router: self)), animated: true)
+        navcontroller.pushViewController(UIHostingController(rootView: ConfirmationView(viewmodel: ConfirmationVM(routerConf: self, authserv: authService()))), animated: true)
 
         
     }
@@ -46,8 +46,8 @@ final class router {
         navcontroller.setViewControllers([authview], animated: true)
     }
     
-    func movetoChat(messages : Messages , usersChat : UsersChat ) {
-        let vm = ChatPageVM(chatHub: chatHub(), router: self, messages: messages , usersChat: usersChat  )
+    func movetoChat(messages : Messages , usersChat : UsersChat , myId : String ,email : String ) {
+        let vm = ChatPageVM(chatHub: chatHub(), router: self, messages: messages , usersChat: usersChat, myId: myId, usersEmail: email  )
         navcontroller.pushViewController(UIHostingController(rootView: ChatPage(ChatPageVM : vm )), animated: true)
     }
 }

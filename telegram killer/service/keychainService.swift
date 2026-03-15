@@ -176,7 +176,70 @@ enum keychainService {
     }
     
     
+    static func writeId(id : String) throws {
+        
+        let id  = [kSecValueData : id.data(using: .utf8)!,
+                           kSecAttrAccount : "myId",
+                                  kSecClass:kSecClassGenericPassword
+                             
+        ]   as CFDictionary
+        
+        
+        let statusref = SecItemAdd(id , nil)
+        
+        print(statusref)
+    }
+    
+    static func  deleteId()  throws {
+        let querydel = [
+            kSecAttrAccount : "myId",
+            kSecClass:kSecClassGenericPassword,
+        
+            
+        ] as CFDictionary
+        
+        
+        let statusdel = SecItemDelete(querydel)
+       
+       if statusdel != errSecSuccess {
+           throw keychainError.Failed(statusdel)
+       }
+
+    }
+    
+    static func getMyId() -> String {
+        let queryacc = [
+            kSecAttrAccount : "myId",
+            kSecClass:kSecClassGenericPassword,
+            kSecReturnData: true,
+            kSecMatchLimit: kSecMatchLimitOne
+            
+        ] as CFDictionary
+        
+        
+        var itemacc: CFTypeRef?
+        let statusacc = SecItemCopyMatching(queryacc , &itemacc)
+        
+        
+        var myId = ""
+        
+        
+        if statusacc == errSecSuccess , let passwordData = itemacc as? Data {
+            let acc = String(decoding : passwordData , as :  UTF8.self)
+                myId = acc
+            print(myId)
+        }
+        
+        
+        return myId
+    }
+    
 }
+
+
+
+
+    
 
 
 enum keychainError : Error {

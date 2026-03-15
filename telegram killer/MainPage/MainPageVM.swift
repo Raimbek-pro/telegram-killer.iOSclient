@@ -24,12 +24,28 @@ class MainPageVM : ObservableObject {
     func createChat(email : String) async throws  {
         
       let id =   try  await getId(to: email )
+    
+    
+      guard  let usersChat =  try? await  RefreshService.withTokenRefresh( {
+         try await chatServ.createChat(id: id)
+      }, router: routerChat ) else {return}
         
-        let usersChat = try await chatServ.createChat(id: id)
         
-        let messages = try await loadMessages(chatId: usersChat.chatId)
+
+            
+            let messages = try await loadMessages(chatId: usersChat.chatId)
+            
         
-        routerChat.movetoChat(messages: messages, usersChat: usersChat)
+        let myId = keychainService.getMyId()
+            DispatchQueue.main.async{
+                self.routerChat.movetoChat(messages: messages, usersChat: usersChat, myId: myId , email : email)
+            }
+        
+       
+        print("created chat")
+  
+        
+
         
        
     }
@@ -38,9 +54,12 @@ class MainPageVM : ObservableObject {
     func getId(to : String) async throws -> String {
         
         do{
-           let id =  try await self.chatServ.accountId(email: to )
+            guard  let id =  try await  RefreshService.withTokenRefresh( {
+               try await  self.chatServ.accountId(email: to )
+            }, router: routerChat ) else {return "No"}
+                //  let id =  try await self.chatServ.accountId(email: to )
             return id
-        } catch{
+        } catch ErrorChat.NotFound{
             throw ErrorChat.NotFound
         }
         

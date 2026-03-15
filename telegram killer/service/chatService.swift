@@ -9,24 +9,7 @@ import Combine
 import Foundation
 class ChatService : ObservableObject {
     
-    func accountMe() async throws -> String {
-        
-        
-        let endpoint = URL(string: "\(servConf.baseURL)/api/account/me" )!
-        
-        let (data , responseCode ) =   try  await  endpointConf.confReq( endpoint: endpoint , httpMethod:  "GET")
-        
-        switch responseCode {
-            
-        case 200 :
-            let decoded = try JSONDecoder().decode(UserId.self, from: data)
-            return decoded.id
-            
-        default :
-            throw codeError.unknown(responseCode)
-        }
-        
-    }
+
     
     
     func accountId(email :String) async throws -> String {
@@ -56,10 +39,18 @@ class ChatService : ObservableObject {
         let (data , responseCode ) =   try  await  endpointConf.confReq( codable: codable ,endpoint: endpoint ,accessToken:  accessToken  )
         
         switch responseCode {
-        case 200:
+        case 201:
+            print("f")
+            do {
+                let decoded = try JSONDecoder().decode(UsersChat.self, from: data)
+            }
+            catch{
+                print("fff")
+                print(error.localizedDescription)
+            }
             let decoded = try JSONDecoder().decode(UsersChat.self, from: data)
+            print("g")
             return decoded
-        
         default :
             throw codeError.unknown(responseCode)
         
@@ -69,17 +60,22 @@ class ChatService : ObservableObject {
     
     func getMessages( chatId :String) async throws -> Messages {
         
-
-        let endpoint = URL(string: "\(servConf.baseURL)/api/chat?chatId=\(chatId)" )!
+        print("enter")
+        let endpoint = URL(string: "\(servConf.baseURL)/api/chat/\(chatId)/messages" )!
         let accessToken = keychainService.getAccessToken()
         let (data , responseCode ) =   try  await  endpointConf.confReq( endpoint: endpoint ,accessToken:  accessToken , httpMethod:  "GET" )
         
         switch responseCode {
             
         case 200 :
+
             let decoded = try JSONDecoder().decode(Messages.self, from: data)
             return decoded
             
+        case 401 :
+            throw codeError.unauthorized
+        case 404 :
+            throw codeError.notFound
         default :
             throw codeError.unknown(responseCode)
         }

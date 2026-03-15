@@ -14,8 +14,8 @@ struct UserId : Codable {
 }
 
 
-struct Message : Hashable {
-    
+struct Message : Identifiable, Hashable {
+    let id : String
     let message : String
     let fromMe : Bool 
 }
@@ -37,14 +37,19 @@ struct UsersChat : Codable {
 }
 
 
-struct Messages : Codable {
-    let messages : [MessageInfo]
-}
+//struct Messages : Codable {
+//    let messages : [MessageInfo]
+//}
 
-struct MessageInfo : Codable {
+
+typealias Messages = [MessageInfo]
+
+struct MessageInfo : Codable , Identifiable{
     let id : String
     let chatId : String
     let senderId : String
     let content : String
     let sentAt  : String
 }
+
+

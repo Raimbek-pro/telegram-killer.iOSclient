@@ -13,6 +13,26 @@ import Combine
 
 class authService : ObservableObject {
     
+    
+    func accountMe() async throws -> String {
+        
+        
+        let endpoint = URL(string: "\(servConf.baseURL)/api/account/me" )!
+        var accesstoken = keychainService.getAccessToken()
+        let (data , responseCode ) =   try  await  endpointConf.confReq( endpoint: endpoint ,accessToken: accesstoken, httpMethod:  "GET")
+        
+        switch responseCode {
+            
+        case 200 :
+            let decoded = try JSONDecoder().decode(UserId.self, from: data)
+            return decoded.id
+            
+        default :
+            throw codeError.unknown(responseCode)
+        }
+        
+    }
+    
    
     func sendLogEmail(_ email : String) async throws {
       
@@ -139,6 +159,7 @@ class authService : ObservableObject {
             
         case 204 :
             try   keychainService.deleteTokens()
+            try keychainService.deleteId()
             UserDefaults().removeObject(forKey: "isAuthorized")
         default :
             throw codeError.unknown(responseCode)

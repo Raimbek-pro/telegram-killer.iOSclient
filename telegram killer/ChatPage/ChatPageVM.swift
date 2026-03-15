@@ -10,92 +10,73 @@ import Combine
 
 class ChatPageVM : ObservableObject {
     var usersChat : UsersChat
-    var messagesHistory : Messages
     var hub: chatHub
     var routerChat : router
     var authServ : authService = authService()
-    
+    var myId : String
+    var usersEmail : String
     @Published var messages: [Message ] = []
     
     
-    var id = ""
+
     
     let chatServ : ChatService = ChatService()
     
-    init(chatHub: chatHub,router : router, messages : Messages, usersChat : UsersChat) {
+    init(chatHub: chatHub,router : router, messages : Messages, usersChat : UsersChat , myId : String , usersEmail : String) {
         self.hub = chatHub
         
         self.routerChat = router
         
-        self.messagesHistory = messages
+      
         
         self.usersChat = usersChat
         
+        self.myId = myId
+        
+        self.usersEmail = usersEmail
+        
+        self.messages = messages.map { message in
+            Message(id:
+                    message.id,
+                    message: message.content,
+                    fromMe: message.senderId == myId)
+        }
     }
     
     func startConnection() async   {
         
-        do{
         
+     try?   await  RefreshService.withTokenRefresh( {
             try await self.startConnectionMessage()
-        }
-        catch{
-            print("❌ \(error)")
-            do{
-                
-                
-                try await authServ.sendRefreshToken()
-                
-                try await self.startConnectionMessage()
-            }
-            catch codeError.unauthorized {
-                print("❌ retry failed: \(error)")
-                try? keychainService.deleteTokens()
-                      UserDefaults().removeObject(forKey: "isAuthorized")
-                      routerChat.movetoLogIn()
-            }
-            catch{
-                print("no internet")
-            }
-            
-            
-        
-            
-        }
-        
+        }, router: routerChat )
+                                                
+   
       
     }
     
     
     func startConnectionMessage() async throws {
         
-        try await self.hub.startConnection()
+       try? await RefreshService.withTokenRefresh({
+            try await self.hub.startConnection()
+           try await self.hub.joinChat(chatId: usersChat.chatId)
+        }, router:routerChat)
+       
         
         for await message in self.hub.messageStream {
             // false represents that message is not mine
-            self.messages.append(Message(message: message, fromMe: false))
+            self.messages.append(Message(id: message.id, message: message.content , fromMe: myId == message.senderId))
         }
     }
     
     
     func sendMessage(to: String, message: String) async  {
         
-        do{
-            try await  self.hub.sendMessage(to: id , message: message)
-        } catch {
-            do{
-                try await authServ.sendRefreshToken()
-                
-                try await  self.hub.sendMessage(to: id, message: message)
-            } catch codeError.unauthorized {
-                try? keychainService.deleteTokens()
-                      UserDefaults().removeObject(forKey: "isAuthorized")
-                      routerChat.movetoLogIn()
-            } catch {
-                print("no internet")
-            }
-           
-        }
+      try?  await RefreshService.withTokenRefresh({
+            try await self.hub.sendMessage(chatId: usersChat.chatId , content: message)
+        }, router:routerChat)
+        
+      
      
     }
     

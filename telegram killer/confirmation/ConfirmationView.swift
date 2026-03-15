@@ -13,9 +13,9 @@ struct ConfirmationView: View {
    
     @State var textWarn = ""
     
-    init(router : router){
+    init(viewmodel : ConfirmationVM ){
         self._viewmodel = StateObject(wrappedValue:
-        ConfirmationVM(routerConf: router)
+       viewmodel
         )
     }
     var body: some View {
@@ -41,6 +41,7 @@ struct ConfirmationView: View {
                 guard let email = UserDefaults().string(forKey: "email") else {return}
                 do{
                  try    await viewmodel.sendCode(email: email  , confCode: confcode)
+                    try await viewmodel.writeId()
                     viewmodel.navigateMain()
                 }
                 catch{

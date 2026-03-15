@@ -26,7 +26,7 @@ struct ChatPage: View {
             VStack{
                 
                 HStack{
-                    Text("User")
+                    Text(viewModel.usersEmail)
                         .clipShape(.capsule)
                         .glassEffect()
                 }
@@ -35,7 +35,7 @@ struct ChatPage: View {
          
             ScrollView{
                 LazyVStack{
-                    ForEach(viewModel.messages, id : \.self){ mes in
+                    ForEach(viewModel.messages ){ mes in
                         if mes.fromMe {
                             HStack{
                                 Spacer()
@@ -94,37 +94,16 @@ struct ChatPage: View {
 
 extension ChatPage {
     
-//    var findEmail : some View{
-//        
-//        Button(action: {
-//            Task {
-//                do {
-//                    viewModel.id =  try await viewModel.getId(to: email)
-//                    showButton = true
-//                    warn = ""
-//                } catch ErrorChat.NotFound{
-//                    showButton = false
-//                    warn = "Email not found "
-//                   
-//                }
-//                
-//            }
-//        }, label: {
-//            Text(Image(systemName: "magnifyingglass"))
-//                .padding()
-//                .glassEffect()
-//                .clipShape(.circle)
-//        })
-//    }
+
     var sendMessage : some View {
         
         Button(action: {
         
                 Task{
                     
-                        await  viewModel.sendMessage(to: viewModel.id, message: message)
+                    await  viewModel.sendMessage(to: viewModel.usersChat.chatId, message: message)
                     
-                        viewModel.messages.append(Message(message: message, fromMe: true))
+//                    viewModel.messages.append(Message(id: UUID().uuidString, message: message, fromMe: true))
                     
               
                 }

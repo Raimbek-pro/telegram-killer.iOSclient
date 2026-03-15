@@ -10,18 +10,26 @@ import Foundation
 
 class ConfirmationVM : ObservableObject {
     var router : router
-    
-    init(routerConf: router) {
+    var authserv  : authService
+    init(routerConf: router , authserv : authService) {
         self.router = routerConf
+        self.authserv = authserv
     }
     
     func sendCode(email : String , confCode : String ) async throws {
         
-            try await authService().sendConf(email: email, confCode: confCode)
+            try await authserv.sendConf(email: email, confCode: confCode)
         
 
         
          
+    }
+    
+    func writeId() async throws{
+      let id =  try await authserv.accountMe()
+        
+        try keychainService.writeId(id: id)
+        
     }
     func navigateMain(){
         router.movetomainPage()

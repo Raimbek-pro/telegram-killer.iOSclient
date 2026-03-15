@@ -30,6 +30,7 @@ class LogOutVM : ObservableObject {
                 self.moveToLogIn()
             } catch{
                 try? keychainService.deleteTokens()
+                try? keychainService.deleteId()
                       UserDefaults().removeObject(forKey: "isAuthorized")
                       self.moveToLogIn()
             }
