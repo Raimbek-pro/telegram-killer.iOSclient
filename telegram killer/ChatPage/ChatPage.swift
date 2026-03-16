@@ -13,8 +13,8 @@ struct ChatPage: View {
     @StateObject var  viewModel : ChatPageVM
     @State var email = ""
     @State var message = ""
-
-
+    @State var showScrollButton = false
+    
     init(ChatPageVM : ChatPageVM ){
         self._viewModel = StateObject(wrappedValue: ChatPageVM)
     }
@@ -33,15 +33,34 @@ struct ChatPage: View {
             }
             
             ScrollViewReader { scrollview in
-                ScrollView{
-                    LazyVStack{
-                       chatScroll
-                    }.onChange(of: viewModel.messages ) {
-                        withAnimation{
+                ZStack{
+                    ScrollView{
+                        LazyVStack{
+                            chatScroll
+                        }.onChange(of: viewModel.messages ) {
+                            if let me = viewModel.messages.last?.fromMe {
+                                if me {
+                                    withAnimation{
+                                        scrollview.scrollTo(viewModel.messages.last?.id , anchor : .bottom)
+                                    }
+                                }
+                                else {
+                                    
+                                    showScrollButton = true
+                                    
+                                }
+                                
+                            }
+                        }.onChange(of: viewModel.isLoaded){
                             scrollview.scrollTo(viewModel.messages.last?.id , anchor : .bottom)
                         }
-                    }.onChange(of: viewModel.isLoaded){
-                        scrollview.scrollTo(viewModel.messages.last?.id , anchor : .bottom)
+                    }
+                    
+                    VStack{
+                        Spacer()
+                        if showScrollButton {
+                            scrollButton(scrollview)
+                        }
                     }
                 }
             }
@@ -124,6 +143,26 @@ extension ChatPage {
             
         }
     }
+    func scrollButton(_ scrollViewProxy : ScrollViewProxy) -> some View {
+  
+            
+            Button(action: {
+                
+                    scrollViewProxy.scrollTo(viewModel.messages.last?.id , anchor : .bottom)
+                    showScrollButton = false
+                
+                
+
+            }, label: {
+                Image(systemName: "arrow.down")
+                    .foregroundStyle(.gray)
+                    .padding()
+                    .glassEffect()
+                    .clipShape(.circle)
+            })
+        
+    }
+ 
 }
 
 
