@@ -15,6 +15,7 @@ class ChatPageVM : ObservableObject {
     var authServ : authService = authService()
     var myId : String
     var usersEmail : String
+   @Published var isLoaded = false
     @Published var messages: [Message ] = []
     
     
@@ -62,11 +63,14 @@ class ChatPageVM : ObservableObject {
            try await self.hub.joinChat(chatId: usersChat.chatId)
         }, router:routerChat)
        
+        isLoaded = true
         
         for await message in self.hub.messageStream {
             // false represents that message is not mine
             self.messages.append(Message(id: message.id, message: message.content , fromMe: myId == message.senderId))
         }
+        
+        
     }
     
     

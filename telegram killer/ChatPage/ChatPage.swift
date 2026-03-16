@@ -32,36 +32,16 @@ struct ChatPage: View {
                 }
             }
             
-         
-            ScrollView{
-                LazyVStack{
-                    ForEach(viewModel.messages ){ mes in
-                        if mes.fromMe {
-                            HStack{
-                                Spacer()
-                                Text(mes.message)
-                                    .frame(minWidth: 20,  alignment: .leading)
-                                
-                                    .padding()
-                                    .background(.cyan)
-                                    .clipShape(.capsule)
-                                
-                            }
-                         
+            ScrollViewReader { scrollview in
+                ScrollView{
+                    LazyVStack{
+                       chatScroll
+                    }.onChange(of: viewModel.messages ) {
+                        withAnimation{
+                            scrollview.scrollTo(viewModel.messages.last?.id , anchor : .bottom)
                         }
-                        else {
-                            HStack{
-                                Text(mes.message)
-                                    .frame(minWidth: 20, alignment: .leading)
-                                    .padding(20)
-                                    .background(.green)
-                                    .clipShape(.capsule)
-                                Spacer()
-                            }
-                            
-                                
-                        }
-                            
+                    }.onChange(of: viewModel.isLoaded){
+                        scrollview.scrollTo(viewModel.messages.last?.id , anchor : .bottom)
                     }
                 }
             }
@@ -82,6 +62,7 @@ struct ChatPage: View {
         .task {
         
                  await viewModel.startConnection()
+                
         }
 
     }
@@ -98,39 +79,54 @@ extension ChatPage {
     var sendMessage : some View {
         
         Button(action: {
-        
                 Task{
-                    
                     await  viewModel.sendMessage(to: viewModel.usersChat.chatId, message: message)
-                    
-//                    viewModel.messages.append(Message(id: UUID().uuidString, message: message, fromMe: true))
-                    
-              
                 }
-
-            
-          
         }, label: {
              Image(systemName: "paperplane")
-            
-
                 .foregroundStyle(.white)
                 .padding()
                 .background(.blue )
                 .glassEffect()
                 .clipShape(.circle)
-               
-                
-            
         })
-        
-        
-        
-        
-        
-      
+    }
+  @ViewBuilder
+    var chatScroll : some View {
+        ForEach(viewModel.messages ){ mes in
+            if mes.fromMe {
+                HStack{
+                    Spacer()
+                    Text(mes.message)
+                        .frame(minWidth: 20,  alignment: .leading)
+                    
+                        .padding()
+                        .background(.cyan)
+                        .clipShape(.capsule)
+                    
+                }
+                .id(mes.id)
+                
+            }
+            else {
+                HStack{
+                    Text(mes.message)
+                        .frame(minWidth: 20, alignment: .leading)
+                        .padding(20)
+                        .background(.green)
+                        .clipShape(.capsule)
+                    Spacer()
+                }
+                .id(mes.id)
+                
+                
+            }
+            
+        }
     }
 }
+
+
 
 #Preview {
     ChatPage(ChatPageVM: ChatPageVM.preview())

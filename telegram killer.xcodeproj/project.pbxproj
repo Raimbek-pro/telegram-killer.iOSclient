@@ -33,11 +33,6 @@
 			path = "telegram killer";
 			sourceTree = "<group>";
 		};
-		63F5FF3F2F5B63AD0061F596 /* chathub */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = chathub;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +52,6 @@
 			children = (
 				635C2E562F33A282003DBC2E /* telegram killer */,
 				635C2E552F33A282003DBC2E /* Products */,
-				63F5FF3F2F5B63AD0061F596 /* chathub */,
 			);
 			sourceTree = "<group>";
 		};
@@ -86,7 +80,6 @@
 			);
 			fileSystemSynchronizedGroups = (
 				635C2E562F33A282003DBC2E /* telegram killer */,
-				63F5FF3F2F5B63AD0061F596 /* chathub */,
 			);
 			name = "telegram killer";
 			packageProductDependencies = (
