@@ -100,6 +100,7 @@ extension ChatPageView {
         Button(action: {
                 Task{
                     await  viewModel.sendMessage(to: viewModel.usersChat.chatId, message: message)
+                    self.message = ""
                 }
         }, label: {
              Image(systemName: "paperplane")
