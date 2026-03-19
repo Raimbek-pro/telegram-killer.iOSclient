@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import SwiftData
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
@@ -16,11 +17,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(windowScene: windowScene)
         let navcontroller = UINavigationController()
-        let router = router(navcontroller: navcontroller)
+        
+        let dataSource =  LocalDataSource(container: SwiftDataContextManager.shared.container, context: SwiftDataContextManager.shared.context)
+        let router = router(navcontroller: navcontroller, dataSource: dataSource)
         let authview = UIHostingController(rootView: AuthView(router: router) )
        //move to folder
         

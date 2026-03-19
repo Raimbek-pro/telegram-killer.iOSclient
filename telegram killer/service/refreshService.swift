@@ -10,7 +10,8 @@ import Foundation
 
 final class RefreshService   {
     
-    
+    private static let dataSource : ChatDataSourceProtocol = LocalDataSource(container: SwiftDataContextManager.shared.container, context: SwiftDataContextManager.shared.context)
+
     private init() {
         
     }
@@ -22,7 +23,7 @@ final class RefreshService   {
          
       
          
-         var reftoken =  keychainService.getRefreshToken()
+         let reftoken =  keychainService.getRefreshToken()
          
          
          
@@ -67,6 +68,7 @@ final class RefreshService   {
                 try? keychainService.deleteTokens()
                 try? keychainService.deleteId()
                       UserDefaults().removeObject(forKey: "isAuthorized")
+                self.dataSource.deleteAll()
                       router.movetoLogIn()
                         return nil
             } catch {

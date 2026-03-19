@@ -10,6 +10,7 @@
 import Combine
 
 import Foundation
+import SwiftData
 
 class MainPageVM : ObservableObject {
     
@@ -17,8 +18,24 @@ class MainPageVM : ObservableObject {
     
     var routerChat : router
     
-    init(routerChat: router) {
+
+    
+    private let dataSource : ChatDataSourceProtocol
+    
+    @Published var chats : [DestinationChats] = []
+    
+    init(routerChat: router , with dataSource : ChatDataSourceProtocol) {
         self.routerChat = routerChat
+  
+        self.dataSource = dataSource
+        
+        
+    }
+    
+
+    
+    func fetchChats()  {
+        self.chats  = dataSource.fetchChats()
     }
     
     func createChat(email : String) async throws  {
@@ -30,11 +47,9 @@ class MainPageVM : ObservableObject {
          try await chatServ.createChat(id: id)
       }, router: routerChat ) else {return}
         
-        
-
-            
-            let messages = try await loadMessages(chatId: usersChat.chatId)
-            
+        let messages = try await loadMessages(chatId: usersChat.chatId)
+      
+       
         
         let myId = keychainService.getMyId()
             DispatchQueue.main.async{

@@ -18,17 +18,17 @@ class ChatPageVM : ObservableObject {
    @Published var isLoaded = false
     @Published var messages: [Message ] = []
     
-    
+    private let dataSource : ChatDataSourceProtocol
 
     
     let chatServ : ChatService = ChatService()
     
-    init(chatHub: chatHub,router : router, messages : Messages, usersChat : UsersChat , myId : String , usersEmail : String) {
+    init(chatHub: chatHub,router : router, messages : Messages, usersChat : UsersChat , myId : String , usersEmail : String, with dataSource : ChatDataSourceProtocol) {
         self.hub = chatHub
         
         self.routerChat = router
         
-      
+        self.dataSource = dataSource
         
         self.usersChat = usersChat
         
@@ -42,6 +42,12 @@ class ChatPageVM : ObservableObject {
                     message: message.content,
                     fromMe: message.senderId == myId)
         }
+    }
+    
+    
+    func saveChat(email : String , lastMessage : MessageInfo){
+        let newChat = DestinationChats(email: email, lastMessage: lastMessage.content, sentAt: lastMessage.sentAt)
+        dataSource.upsert(lastChat: newChat)
     }
     
     func startConnection() async   {
@@ -68,6 +74,8 @@ class ChatPageVM : ObservableObject {
         for await message in self.hub.messageStream {
             // false represents that message is not mine
             self.messages.append(Message(id: message.id, message: message.content , fromMe: myId == message.senderId))
+            self.saveChat(email: usersEmail, lastMessage: message )
+            
         }
         
         
@@ -80,7 +88,8 @@ class ChatPageVM : ObservableObject {
             try await self.hub.sendMessage(chatId: usersChat.chatId , content: message)
         }, router:routerChat)
         
-      
+  
+     
      
     }
     

@@ -11,9 +11,9 @@ struct LogOut: View {
     
     @StateObject var viewmodel : LogOutVM
     @State var textWarn = ""
-    init(router : router){
+    init(logOutVM : LogOutVM){
        
-        self._viewmodel = StateObject(wrappedValue: LogOutVM(router: router) )
+        self._viewmodel = StateObject(wrappedValue: logOutVM )
     }
     var body: some View {
         logout

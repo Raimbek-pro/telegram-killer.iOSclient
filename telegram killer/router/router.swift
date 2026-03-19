@@ -8,13 +8,17 @@
 import Foundation
 
 import SwiftUI
+import SwiftData
 
 final class router {
     
      let navcontroller : UINavigationController
-    
-    init(navcontroller: UINavigationController) {
+    let dataSource : ChatDataSourceProtocol
+    init(navcontroller: UINavigationController ,dataSource : ChatDataSourceProtocol) {
         self.navcontroller = navcontroller
+        self.dataSource = dataSource
+        
+        
     }
     
     func movetoconf() {
@@ -25,10 +29,13 @@ final class router {
     }
     
     func movetomainPage() {
- 
-        let   mainpage_Tab = UIHostingController(rootView: MainPageView(viewModel: MainPageVM(routerChat: self )))
+        let vm = MainPageVM(routerChat: self,  with: dataSource)
+        let   mainpage_Tab = MainPageHostingController(rootView: MainPageView(viewModel: vm ))
+        mainpage_Tab.onAppear  = {
+            vm.fetchChats()
+        }
         
-        let account_Tab = UIHostingController(rootView: LogOut(router: self))
+        let account_Tab = UIHostingController(rootView: LogOut(logOutVM: LogOutVM(router: self, dataSource: dataSource)))
         
         mainpage_Tab.tabBarItem = UITabBarItem(title: "Main page", image: UIImage(systemName: "chart.bar.doc.horizontal") , tag: 0)
         account_Tab.tabBarItem = UITabBarItem(title: "Log out", image: UIImage(systemName: "door.left.hand.open"), tag: 1)
@@ -47,7 +54,7 @@ final class router {
     }
     
     func movetoChat(messages : Messages , usersChat : UsersChat , myId : String ,email : String ) {
-        let vm = ChatPageVM(chatHub: chatHub(), router: self, messages: messages , usersChat: usersChat, myId: myId, usersEmail: email  )
+        let vm = ChatPageVM(chatHub: chatHub(), router: self, messages: messages , usersChat: usersChat, myId: myId, usersEmail: email, with: dataSource )
         navcontroller.pushViewController(UIHostingController(rootView: ChatPage(ChatPageVM : vm )), animated: true)
     }
 }

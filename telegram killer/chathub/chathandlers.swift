@@ -17,6 +17,7 @@ class chatHub   {
     
 
     var connection : HubConnection
+
     
     init() {
         
@@ -29,6 +30,8 @@ class chatHub   {
         self.connection = HubConnectionBuilder()
             .withUrl(url: "ws://localhost:8080/hub/chat" , options:  options)
             .build()
+        
+     
     }
     
     func startConnection() async  throws{
@@ -45,7 +48,7 @@ class chatHub   {
         print("connected")
     }
     
-    
+
     
     func joinChat(chatId : String ) async throws {
         try await connection.send(method: "joinChat", arguments: chatId )
