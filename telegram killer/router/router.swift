@@ -35,7 +35,7 @@ final class router {
             vm.fetchChats()
         }
         
-        let account_Tab = UIHostingController(rootView: LogOut(logOutVM: LogOutVM(router: self, dataSource: dataSource)))
+        let account_Tab = UIHostingController(rootView: LogOutView(logOutVM: LogOutVM(router: self, dataSource: dataSource)))
         
         mainpage_Tab.tabBarItem = UITabBarItem(title: "Main page", image: UIImage(systemName: "chart.bar.doc.horizontal") , tag: 0)
         account_Tab.tabBarItem = UITabBarItem(title: "Log out", image: UIImage(systemName: "door.left.hand.open"), tag: 1)
@@ -55,6 +55,6 @@ final class router {
     
     func movetoChat(messages : Messages , usersChat : UsersChat , myId : String ,email : String ) {
         let vm = ChatPageVM(chatHub: chatHub(), router: self, messages: messages , usersChat: usersChat, myId: myId, usersEmail: email, with: dataSource )
-        navcontroller.pushViewController(UIHostingController(rootView: ChatPage(ChatPageVM : vm )), animated: true)
+        navcontroller.pushViewController(UIHostingController(rootView: ChatPageView(ChatPageVM : vm )), animated: true)
     }
 }
