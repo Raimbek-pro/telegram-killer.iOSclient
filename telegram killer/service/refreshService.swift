@@ -42,6 +42,9 @@ final class RefreshService   {
          case 401 :
              
              throw codeError.unauthorized
+             
+         case 400 :
+             throw ErrorChat.BadRequest
          default :
              
              throw codeError.unknown(responseCode)
@@ -57,8 +60,9 @@ final class RefreshService   {
         
         do{
          return   try await  operation()
-        } catch  ErrorChat.NotFound{
-            throw  ErrorChat.NotFound
+        } catch  ErrorChat.BadRequest{
+            print("Something please pz")
+            throw  ErrorChat.BadRequest
         }catch {
             do{
                 try await self.sendRefreshToken()

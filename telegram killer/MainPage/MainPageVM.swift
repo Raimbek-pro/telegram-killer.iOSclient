@@ -29,7 +29,7 @@ class MainPageVM : ObservableObject {
   
         self.dataSource = dataSource
         
-        
+        self.chats  = dataSource.fetchChats()
     }
     
 
@@ -43,7 +43,7 @@ class MainPageVM : ObservableObject {
       let id =   try  await getId(to: email )
     
     
-      guard  let usersChat =  try? await  RefreshService.withTokenRefresh( {
+      guard  let usersChat =  try await  RefreshService.withTokenRefresh( {
          try await chatServ.createChat(id: id)
       }, router: routerChat ) else {return}
         
@@ -74,8 +74,9 @@ class MainPageVM : ObservableObject {
             }, router: routerChat ) else {return "No"}
                 //  let id =  try await self.chatServ.accountId(email: to )
             return id
-        } catch ErrorChat.NotFound{
-            throw ErrorChat.NotFound
+        } catch ErrorChat.BadRequest{
+            print("Something please")
+            throw ErrorChat.BadRequest
         }
         
 

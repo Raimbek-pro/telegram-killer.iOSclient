@@ -24,7 +24,8 @@ class ChatService : ObservableObject {
         case 200 :
             let decoded = try JSONDecoder().decode(UserId.self, from: data)
             return decoded.id
-            
+        case 400 :
+            throw ErrorChat.BadRequest
         default :
             throw codeError.unknown(responseCode)
         }
@@ -51,6 +52,8 @@ class ChatService : ObservableObject {
             let decoded = try JSONDecoder().decode(UsersChat.self, from: data)
             print("g")
             return decoded
+        case 400 :
+            throw ErrorChat.BadRequest
         default :
             throw codeError.unknown(responseCode)
         

@@ -113,6 +113,7 @@ class ChatPageVM : ObservableObject {
 
 enum ErrorChat  : Error {
     case NotFound
+    case BadRequest
 }
 
 
