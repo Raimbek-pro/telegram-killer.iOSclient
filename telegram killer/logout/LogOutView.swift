@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LogOut: View {
+struct LogOutView: View {
     
     @StateObject var viewmodel : LogOutVM
     @State var textWarn = ""
