@@ -10,7 +10,7 @@ import SwiftUI
 struct ConfirmationView: View {
     @StateObject var viewmodel : ConfirmationVM
     @State var confcode = ""
-   
+    @State var isLoading = false
     @State var textWarn = ""
     
     init(viewmodel : ConfirmationVM ){
@@ -38,23 +38,33 @@ struct ConfirmationView: View {
     var buttonconf : some View {
         Button(action: {
             Task{
+                isLoading = true
+                defer {isLoading = false}
                 guard let email = UserDefaults().string(forKey: "email") else {return}
                 do{
                  try    await viewmodel.sendCode(email: email  , confCode: confcode)
                     try await viewmodel.writeId()
                     viewmodel.navigateMain()
                 }
-                catch{
+                catch codeError.badRequest{
+                   
+                    textWarn = ("whoah  wrong code")
+                } catch{
+                    textWarn = ("problems with server")
                     print(error)
-                    textWarn = ("whoah whoah \(error.localizedDescription)")
                 }
                
             }
             
         }, label: {
-            Text("confirm")
+            if isLoading {
+                ProgressView()
+            } else{
+                Text("confirm")
+            }
+           
         })
-        
+        .disabled(isLoading)
         .buttonStyle(.glassProminent)
         
         .padding(20)
