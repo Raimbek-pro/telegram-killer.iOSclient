@@ -31,58 +31,7 @@ struct MainPageView : View {
                 LazyVStack {
              
                     ForEach(viewModel.chats) { chat in
-                        VStack(alignment: .leading){
-                       
-                            HStack{
-                                
-                                Circle()
-                                    .fill(.gray)
-                                    .frame(width: 60, height: 60)
-                                   
-                                    .opacity(0.5)
-                                VStack(alignment: .leading) {
-                                    
-                                    HStack{
-                                       
-                                            Text(chat.email)
-                                                .bold()
-                                                .frame(alignment: .leading)
-                                           
-                                        
-                                      
-                                       
-                                    }
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical )
-                                
-                        
-                                    HStack{
-                                        Text(chat.lastMessage)
-                                       
-                                    }
-                                    .padding(.horizontal, 10)
-
-                            }
-              
-                     
-                            }
-                
-                            
-                    
-                         
-                            Divider()
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                        
-                            Task{
-                                await goToChat(email: chat.email)
-                            }
-                        }
-                      
-                        
-                      
-                        
+                        self.chats(chat: chat)
                     }
                 }
              
@@ -162,6 +111,58 @@ extension MainPageView {
         
         .frame(width: 300,height: 250)
     
+    }
+    
+    func chats(chat : DestinationChats) ->  some View {
+        VStack(alignment: .leading){
+       
+            HStack{
+                
+                Circle()
+                    .fill(.gray)
+                    .frame(width: 60, height: 60)
+                   
+                    .opacity(0.5)
+                    .padding(.horizontal, 10)
+                VStack(alignment: .leading) {
+                    
+                    HStack{
+                       
+                            Text(chat.email)
+                                .bold()
+                                .frame(alignment: .leading)
+                           
+                        
+                      
+                       
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical )
+                
+        
+                    HStack{
+                        Text(chat.lastMessage)
+                       
+                    }
+                    .padding(.horizontal, 10)
+
+            }
+
+     
+            }
+
+            
+    
+         
+            Divider()
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+        
+            Task{
+                await goToChat(email: chat.email)
+            }
+        }
     }
 }
 
