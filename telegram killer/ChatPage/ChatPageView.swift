@@ -73,14 +73,10 @@ struct ChatPageView: View {
                             scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor : .bottom)
                         }
                     }.scrollPosition($scrollPosition)
-                        .onChange(of: scrollPosition){ _ , newPos  in
-                            let currentID = newPos.viewID(type: String.self)
-                            
-                            if currentID == viewModel.messages.last?.id{
-                                showScrollButton = false
-                            } else{
-                                showScrollButton = true
-                            }
+                        .onChange(of: scrollPosition){
+                         let dis = distanceFromBottom ?? 0
+                            showScrollButton = dis > 0
+                         
                         }
                       
                     
