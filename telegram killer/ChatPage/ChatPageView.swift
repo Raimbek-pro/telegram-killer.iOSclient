@@ -15,6 +15,9 @@ struct ChatPageView: View {
     @State var message = ""
     @State var showScrollButton = false
     @State private var scrollPosition = ScrollPosition(idType: String.self)
+    
+    @State private var  offset : [String :CGFloat]  = [:]
+
     init(ChatPageVM : ChatPageVM ){
         self._viewModel = StateObject(wrappedValue: ChatPageVM)
     }
@@ -33,53 +36,63 @@ struct ChatPageView: View {
             }
             
           
-                ZStack{
-                    ScrollView{
-                        LazyVStack{
-                            chatScroll
-                        }
-                        .scrollTargetLayout()
-                        .onChange(of: viewModel.messages ) {
-                            if let me = viewModel.messages.last?.fromMe {
-                                if me {
-                                    withAnimation{
-                                        scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor : .bottom)
-                                    }
+            ZStack{
+                GeometryReader { geo in
+                    let screenWidth = geo.size.width
+                
+                ScrollView{
+                    LazyVStack{
+                        chatScroll(screenWidth: screenWidth)
+                    }
+                    .scrollTargetLayout()
+                    .onChange(of: viewModel.messages ) {
+                        if let me = viewModel.messages.last?.fromMe {
+                            if me {
+                                withAnimation{
+                                    scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor : .bottom)
                                 }
-                                else {
+                            }
+                            else {
+                                if let dis = distanceFromBottom {
+                                    print("dis \(dis)")
+                                    if dis < 3 {
+                                        withAnimation{
+                                            scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor : .bottom)
+                                        }
+                                        
+                                    }
+                                    else {
+                                        showScrollButton = true
+                                    }
                                     
+                                }
                                 
-
-                                    if let dis = distanceFromBottom {
-                                        print("dis \(dis)")
-                                        if dis < 3 {
-                                            withAnimation{
-                                                scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor : .bottom)
-                                            }
-
-                                        }
-                                        else {
-                                            showScrollButton = true
-                                        }
-
-                                    }
-                                    
-                                    
-                                    
-                                }
+                                
                                 
                             }
-                        }.onChange(of: viewModel.isLoaded){
-                            scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor : .bottom)
+                            
                         }
-                    }.scrollPosition($scrollPosition)
-                        .onChange(of: scrollPosition){
-                         let dis = distanceFromBottom ?? 0
-                            showScrollButton = dis > 0
-                         
-                        }
-                      
-                    
+                    }.onChange(of: viewModel.isLoaded){
+                        scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor : .bottom)
+                    }
+                }.scrollPosition($scrollPosition)
+                    .onChange(of: scrollPosition){
+                        
+                        var currentID =  scrollPosition.viewID(type: String.self)
+                        var currentIndex = viewModel.messages.firstIndex(where: { $0.id == currentID})
+                        var lastIndex = viewModel.messages.indices.last
+                        
+                        print("currentID \(currentID)")
+                        print("currentIndex \(currentIndex)")
+                        print("\(lastIndex) lastIndex")
+                        
+                        
+                        let dis = distanceFromBottom ?? 0
+                        showScrollButton = dis > 0
+                        
+                    }
+                
+            }
                     VStack{
                         Spacer()
                         if showScrollButton {
@@ -136,35 +149,57 @@ extension ChatPageView {
         })
     }
   @ViewBuilder
-    var chatScroll : some View {
+    func chatScroll(screenWidth : CGFloat) -> some View {
         ForEach(viewModel.messages ){ mes in
-            if mes.fromMe {
-                HStack{
-                    Spacer()
-                    Text(mes.message)
-                        .frame(minWidth: 20,  alignment: .leading)
+          
+                ZStack(alignment: .leading){
+                    Text(FormatDate.formatDate(date: mes.sentAt)?.formatted() ?? "No time")
+                        .padding(.horizontal , 10)
+                        .fixedSize()
+                        .offset(x: (offset[mes.id] ?? 0)+screenWidth)
+                    HStack{
+                        if mes.fromMe {
+                            Spacer()
+                        }
+                        Text(mes.message)
+                            .frame(minWidth: 20,  alignment: .leading)
+                        
+                            .padding()
+                            .background(mes.fromMe ?   .cyan : .green)
+                            .clipShape(.capsule)
+                        
+                        
+                        
+                        if !mes.fromMe {
+                            Spacer()
+                        }
+                        
+                    }
                     
-                        .padding()
-                        .background(.cyan)
-                        .clipShape(.capsule)
+                    .offset(x: offset[mes.id] ?? 0)
+                    .contentShape(Rectangle())
+                   .simultaneousGesture(
+                
+                        DragGesture(minimumDistance: 20)
+                            .onChanged{ value in
+                                let translation = value.translation.width
+                                if translation < 0 {
+                                    offset[mes.id] = translation
+                                }
+                            }.onEnded{_ in
+                                withAnimation(.bouncy){
+                                
+                                    offset[mes.id] = 0
+                                }
+                            }
                     
+                    )
                 }
                 .id(mes.id)
+            
                 
-            }
-            else {
-                HStack{
-                    Text(mes.message)
-                        .frame(minWidth: 20, alignment: .leading)
-                        .padding(20)
-                        .background(.green)
-                        .clipShape(.capsule)
-                    Spacer()
-                }
-                .id(mes.id)
-                
-                
-            }
+            
+         
             
         }
     }
@@ -198,7 +233,7 @@ extension ChatPageView {
             return nil }
         
         let rawDistance = lastIndex -  currentIndex
-        let viewportSize = 10
+        let viewportSize = 11
         let adjusted = rawDistance - viewportSize
         return max(0,adjusted)
     }

@@ -17,7 +17,8 @@ struct UserId : Codable {
 struct Message : Identifiable, Hashable {
     let id : String
     let message : String
-    let fromMe : Bool 
+    let fromMe : Bool
+    let sentAt : String
 }
 
 

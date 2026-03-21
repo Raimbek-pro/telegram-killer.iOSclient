@@ -40,10 +40,11 @@ class ChatPageVM : ObservableObject {
             Message(id:
                     message.id,
                     message: message.content,
-                    fromMe: message.senderId == myId)
+                    fromMe: message.senderId == myId, sentAt: message.sentAt)
         }
     }
     
+ 
     
     func saveChat(email : String , lastMessage : MessageInfo){
         let newChat = DestinationChats(email: email, lastMessage: lastMessage.content, sentAt: lastMessage.sentAt)
@@ -73,7 +74,7 @@ class ChatPageVM : ObservableObject {
         
         for await message in self.hub.messageStream {
             // false represents that message is not mine
-            self.messages.append(Message(id: message.id, message: message.content , fromMe: myId == message.senderId))
+            self.messages.append(Message(id: message.id, message: message.content , fromMe: myId == message.senderId, sentAt: message.sentAt))
             self.saveChat(email: usersEmail, lastMessage: message )
             
         }
