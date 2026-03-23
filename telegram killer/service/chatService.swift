@@ -40,7 +40,7 @@ class ChatService : ObservableObject {
         let (data , responseCode ) =   try  await  endpointConf.confReq( codable: codable ,endpoint: endpoint ,accessToken:  accessToken  )
         
         switch responseCode {
-        case 201:
+        case 200...299:
             print("f")
             do {
                 let decoded = try JSONDecoder().decode(UsersChat.self, from: data)
@@ -71,7 +71,7 @@ class ChatService : ObservableObject {
         switch responseCode {
             
         case 200 :
-
+            
             let decoded = try JSONDecoder().decode(Messages.self, from: data)
             return decoded
             

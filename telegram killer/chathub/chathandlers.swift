@@ -28,7 +28,7 @@ class chatHub   {
         }
         
         self.connection = HubConnectionBuilder()
-            .withUrl(url: "ws://localhost:8080/hub/chat" , options:  options)
+            .withUrl(url: "https://d532-37-99-18-47.ngrok-free.app/hub/chat" , options:  options)
             .build()
         
      
@@ -48,13 +48,24 @@ class chatHub   {
         print("connected")
     }
     
-
+    func markAsReadRequest(chatId : String , messageId : String ) async throws {
+        try await connection.send(method: "markAsRead", arguments: chatId  , messageId )
+        print("joined")
+        
+    }
     
     func joinChat(chatId : String ) async throws {
         try await connection.send(method: "joinChat", arguments: chatId )
         print("joined")
         
     }
+    
+    func leaveChat(chatId : String ) async throws {
+        try await connection.send(method: "leaveChat", arguments: chatId )
+        print("left")
+        
+    }
+
     
     
     func sendMessage(chatId : String , content : String) async throws {
@@ -66,7 +77,7 @@ class chatHub   {
     
     
     
-    var messageStream : AsyncStream<MessageInfo> {
+    private(set) lazy  var messageStream : AsyncStream<MessageInfo> = {
         AsyncStream { continuation in
             
             Task {
@@ -77,11 +88,22 @@ class chatHub   {
                 
             }
         }
-        
-        
-        
-        
-    }
+    }()
+    
+//    private(set) lazy   var readReceiptStream : AsyncStream<(String , String)> =  {
+//        AsyncStream { continuation in
+//            
+//            Task {
+//                await connection.on("markAsRead"){ (chatId : String ,   messageId : String ) in
+//                 
+//                    continuation.yield((chatId,messageId))
+//                }
+//
+//            }
+//            
+//        }
+//    }()
+    
 }
     
    

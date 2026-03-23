@@ -16,6 +16,8 @@ final class RefreshService   {
         
     }
     
+    private static let refreshActor = TokenRefreshActor()
+    
      static    func sendRefreshToken() async throws{
          
          
@@ -65,7 +67,7 @@ final class RefreshService   {
             throw  ErrorChat.BadRequest
         }catch {
             do{
-                try await self.sendRefreshToken()
+                try await refreshActor.refresh()
                 
               return  try await  operation()
             } catch codeError.unauthorized {
@@ -84,4 +86,21 @@ final class RefreshService   {
 
     }
     
+}
+
+actor TokenRefreshActor {
+    private var refreshTask: Task<Void, Error>?
+    
+    func refresh() async throws {
+        if let existing = refreshTask {
+            try await existing.value
+            return
+        }
+        let task = Task {
+            try await RefreshService.sendRefreshToken()
+        }
+        refreshTask = task
+        defer { refreshTask = nil }
+        try await task.value
+    }
 }

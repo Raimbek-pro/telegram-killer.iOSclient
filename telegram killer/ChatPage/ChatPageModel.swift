@@ -43,11 +43,16 @@ struct UsersChat : Codable {
 //}
 
 
-typealias Messages = [MessageInfo]
+
+struct Messages : Codable {
+    let chatId : String
+    let messages : [MessageInfo]
+    let lastReadMessageId : String?
+}
 
 struct MessageInfo : Codable , Identifiable{
     let id : String
-    let chatId : String
+    let chatId : String?
     let senderId : String
     let content : String
     let sentAt  : String
