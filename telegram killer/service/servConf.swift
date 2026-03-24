@@ -10,7 +10,7 @@ import Foundation
 
 enum servConf : String {
     
-    case server = "https://d532-37-99-18-47.ngrok-free.app"
+    case server = "http://localhost:8080"
     
     
     static var baseURL  : String{

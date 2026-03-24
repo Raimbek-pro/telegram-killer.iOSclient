@@ -28,7 +28,7 @@ class chatHub   {
         }
         
         self.connection = HubConnectionBuilder()
-            .withUrl(url: "https://d532-37-99-18-47.ngrok-free.app/hub/chat" , options:  options)
+            .withUrl(url: "\(servConf.baseURL)/hub/chat" , options:  options)
             .build()
         
      
@@ -90,19 +90,19 @@ class chatHub   {
         }
     }()
     
-//    private(set) lazy   var readReceiptStream : AsyncStream<(String , String)> =  {
-//        AsyncStream { continuation in
-//            
-//            Task {
-//                await connection.on("markAsRead"){ (chatId : String ,   messageId : String ) in
-//                 
-//                    continuation.yield((chatId,messageId))
-//                }
-//
-//            }
-//            
-//        }
-//    }()
+    private(set) lazy   var readReceiptStream : AsyncStream<MessageRead> =  {
+        AsyncStream { continuation in
+            
+            Task {
+                await connection.on("messageRead"){ (message : MessageRead) in
+                 
+                    continuation.yield(message)
+                }
+
+            }
+            
+        }
+    }()
     
 }
     

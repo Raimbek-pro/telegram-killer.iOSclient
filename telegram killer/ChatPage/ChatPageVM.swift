@@ -78,11 +78,7 @@ class ChatPageVM : ObservableObject {
             try await self.hub.startConnection()
            try await self.hub.joinChat(chatId: usersChat.chatId)
         }, router:routerChat)
-        defer {
-            Task {
-                try await self.hub.leaveChat(chatId: usersChat.chatId)
-            }
-        }
+      
         isLoaded = true
         
 //        
@@ -93,11 +89,18 @@ class ChatPageVM : ObservableObject {
 //                
 //            }
 //        }
-        for await message in self.hub.messageStream {
-            // false represents that message is not mine
-            self.messages.append(Message(id: message.id, message: message.content , fromMe: myId == message.senderId, sentAt: message.sentAt))
-            self.saveChat(email: usersEmail, lastMessage: message )
-            
+        Task{
+            for await message in self.hub.readReceiptStream {
+                self.lastRead = message.messageId
+            }
+        }
+        Task{
+            for await message in self.hub.messageStream {
+                // false represents that message is not mine
+                self.messages.append(Message(id: message.id, message: message.content , fromMe: myId == message.senderId, sentAt: message.sentAt))
+                self.saveChat(email: usersEmail, lastMessage: message )
+                
+            }
         }
         
         

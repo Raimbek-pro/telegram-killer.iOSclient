@@ -59,3 +59,11 @@ struct MessageInfo : Codable , Identifiable{
 }
 
 
+
+struct MessageRead  : Codable {
+    let chatId : String
+    let messageId : String
+    let userId : String
+    let readAt : String
+    
+}

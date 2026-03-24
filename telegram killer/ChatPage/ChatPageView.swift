@@ -34,13 +34,16 @@ struct ChatPageView: View {
                 
                 HStack{
                     Text(viewModel.usersEmail)
-                        .clipShape(.capsule)
-                        .glassEffect()
+                        .font(.headline)
+                        .padding(5)
+                        .glassEffect( )
                 }
             }
+            .padding(.bottom, 20)
             
           
             ZStack{
+               
                 GeometryReader { geo in
                     let screenWidth = geo.size.width
                 
@@ -142,14 +145,24 @@ struct ChatPageView: View {
                 sendMessage
                     
             }
-            
-            
-            
+     
         }
+        .background(
+            LinearGradient(colors: [
+                .white.opacity(0.3), .blue.opacity(0.7)
+            ], startPoint: .topLeading, endPoint:   .bottomTrailing)
+            .ignoresSafeArea()
+            )
+        
         .task {
         
                  await viewModel.startConnection()
                 
+        }
+        .onDisappear{
+            Task{
+                try? await viewModel.hub.leaveChat(chatId: viewModel.chatId)
+            }
         }
 
     }
@@ -178,6 +191,7 @@ extension ChatPageView {
                 .glassEffect()
                 .clipShape(.circle)
         })
+        .padding(.horizontal, 3)
     }
   @ViewBuilder
     func chatScroll(screenWidth : CGFloat) -> some View {
@@ -192,28 +206,36 @@ extension ChatPageView {
                         if mes.fromMe {
                             Spacer()
                         }
-                        VStack(alignment: .leading){
-                            Text(mes.message)
-                                .alignmentGuide(.leading, computeValue: { dim in
-                                    dim[.trailing]
-                                })
-                            if mes.fromMe{
-                                Image(systemName :{
-                                    let current = viewModel.messages.firstIndex(where: {$0.id == mes.id}) ?? 0
-                                    let last = viewModel.messages.firstIndex(where: {$0.id == viewModel.lastRead}) ?? 0
-                                    return current <= last ? "checkmark.circle.fill" :  "checkmark.circle"
-                                }())
+                        
+                            VStack(alignment: .leading){
+                                Text(mes.message)
+                                  
                                 
-                                .padding(.horizontal , 5)
+                                    .alignmentGuide(.leading, computeValue: { dim in
+                                        dim[.trailing]
+                                    })
+                                
+                                if mes.fromMe{
+                                    Image(systemName :{
+                                        let current = viewModel.messages.firstIndex(where: {$0.id == mes.id}) ?? 0
+                                        let last = viewModel.messages.firstIndex(where: {$0.id == viewModel.lastRead}) ?? 0
+                                        return current <= last ? "checkmark.circle.fill" :  "checkmark.circle"
+                                    }())
+                                    
+                                    .padding(.horizontal , 5)
+                                }
+                                
                             }
-                                
-                        }
-                        
+                            
                             .frame(minWidth: 20,  alignment: .leading)
-                        
                             .padding()
-                            .background(mes.fromMe ?   .cyan : .green)
-                            .clipShape(.capsule)
+                           
+                            .glassEffect(
+                                .clear.interactive(),
+                                            in: RoundedRectangle(cornerRadius: 30)
+                                        )
+                            
+                            
                         
                         
                         
