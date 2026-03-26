@@ -4,7 +4,7 @@
 
 Chat iOS client using SwiftUI + UIKit . Allows sending plain text  messages and marking  as read in real-time, saving chats locally.
 
----
+
 
 MADE FOR PEOPLE BY PEOPLE
 
@@ -34,7 +34,7 @@ Tokens Cycle
 Liquid Glass
 
 
----
+
 
 
 ## Prerequisites :
@@ -44,14 +44,14 @@ iOS 26+
 Xcode 26
 
 
-##Usage :
+## Usage :
 
 
--- Clone this repository
+ Clone this repository
 
--- git clone https://github.com/Raimbek-pro/telegram-killer.iOSclient.git
--- cd telegram-killer.iOSclient
---open telegram killer.xcodeproj
+ git clone https://github.com/Raimbek-pro/telegram-killer.iOSclient.git
+ cd telegram-killer.iOSclient
+ open telegram killer.xcodeproj  
 
 
 ## follow instructions from Telegram-killer.API  :
