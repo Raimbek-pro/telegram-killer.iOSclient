@@ -6,12 +6,17 @@ Chat iOS client using SwiftUI + UIKit . Allows sending plain text  messages and 
 
 ---
 
+MADE FOR PEOPLE BY PEOPLE
 
 ##  Screenshots
+
 <p align="center">
-  <img src="screenshots/screen1.png" width="250"/>
-  <img src="screenshots/screen2.png" width="250"/>
-  <img src= "creenshots/screen3.png" width="250"/>
+  <img src="screenshots/screen1.png" width="200"/>
+  <img src="screenshots/screen3.png" width="200"/>
+</p>
+
+<p align="center">
+  <img src="screenshots/screen2.png" width="400"/>
 </p>
 
 ## Tech Stack:
