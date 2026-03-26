@@ -22,21 +22,31 @@ struct MainPageView : View {
         self._viewModel = StateObject(wrappedValue: viewModel)
     }
     var body: some View {
-        
-        if viewModel.chats.isEmpty {
-                    textSomeone
-        } else {
-            textSomeoneField
-            ScrollView {
-                LazyVStack {
-             
-                    ForEach(viewModel.chats) { chat in
-                        self.chats(chat: chat)
+        VStack{
+            if viewModel.chats.isEmpty {
+                textSomeone
+                   
+                
+            } else {
+                textSomeoneField
+                ScrollView {
+                    LazyVStack {
+                        
+                        ForEach(viewModel.chats) { chat in
+                            self.chats(chat: chat)
+                        }
                     }
+                    
                 }
-             
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(
+                LinearGradient(colors: [
+                    .white.opacity(0.5), .blue.opacity(0.5), .cyan.opacity(0.2)
+                ], startPoint: .topLeading, endPoint:   .bottomTrailing)
+                .ignoresSafeArea()
+            )
         
     }
 }
@@ -74,8 +84,8 @@ extension MainPageView {
         }, label: {
             Text(Image(systemName: "magnifyingglass"))
                 .padding()
-                .glassEffect()
-                .clipShape(.circle)
+                .glassEffect(.clear)
+                
         })
     }
     
@@ -84,15 +94,19 @@ extension MainPageView {
         HStack{
             TextField("Write email", text: $email)
                 .frame(height: 50)
-                .background(.white)
+                .glassEffect(.clear)
+               
                 .clipShape(.capsule)
+                
                 .offset(x: isShaking ? -10 : 0 )
                
                 .padding()
             
             findEmail
                 .padding()
+               
         }
+        
 
     }
     
@@ -123,7 +137,7 @@ extension MainPageView {
                     .frame(width: 60, height: 60)
                    
                     .opacity(0.5)
-                    .padding(.horizontal, 10)
+                    .padding(20)
                 VStack(alignment: .leading) {
                     
                     HStack{
@@ -150,6 +164,7 @@ extension MainPageView {
 
      
             }
+            
 
             
     
@@ -157,6 +172,7 @@ extension MainPageView {
             Divider()
         }
         .contentShape(Rectangle())
+        .glassEffect(.clear.interactive())
         .onTapGesture {
         
             Task{
