@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		63723CFB2F759E8F000EC724 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 63723CFA2F759E82000EC724 /* README.md */; };
 		63F5FF3E2F5B63780061F596 /* SignalRClient in Frameworks */ = {isa = PBXBuildFile; productRef = 63F5FF3D2F5B63780061F596 /* SignalRClient */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		635C2E542F33A282003DBC2E /* telegram killer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "telegram killer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		63723CFA2F759E82000EC724 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -33,6 +35,11 @@
 			path = "telegram killer";
 			sourceTree = "<group>";
 		};
+		63723CFC2F75A2A7000EC724 /* screenshots */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = screenshots;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +57,8 @@
 		635C2E4B2F33A282003DBC2E = {
 			isa = PBXGroup;
 			children = (
+				63723CFC2F75A2A7000EC724 /* screenshots */,
+				63723CFA2F759E82000EC724 /* README.md */,
 				635C2E562F33A282003DBC2E /* telegram killer */,
 				635C2E552F33A282003DBC2E /* Products */,
 			);
@@ -80,6 +89,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				635C2E562F33A282003DBC2E /* telegram killer */,
+				63723CFC2F75A2A7000EC724 /* screenshots */,
 			);
 			name = "telegram killer";
 			packageProductDependencies = (
@@ -141,6 +151,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63723CFB2F759E8F000EC724 /* README.md in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
