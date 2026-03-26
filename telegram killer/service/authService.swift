@@ -28,6 +28,7 @@ class authService : ObservableObject {
             return decoded.id
             
         default :
+            print("g")
             throw codeError.unknown(responseCode)
         }
         

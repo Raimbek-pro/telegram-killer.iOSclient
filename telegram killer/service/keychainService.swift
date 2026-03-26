@@ -84,43 +84,42 @@ enum keychainService {
     
     
     static func writeTokens(tokens : tokens ) throws {
-        let queryrefresh  = [kSecValueData :tokens.refreshToken.data(using: .utf8) as Any,
-                           kSecAttrAccount : "refreshToken",
+        try writeToken(value: tokens.refreshToken, account: "refreshToken")
+        try writeToken(value: tokens.accessToken, account: "accessToken")
+        
+    }
+    
+    private static func writeToken(value : String , account : String ) throws{
+        let queryrefresh  = [kSecValueData : value.data(using: .utf8) as Any,
+                           kSecAttrAccount : account,
                                   kSecClass:kSecClassGenericPassword
                              
         ]   as CFDictionary
         
-        let statusref = SecItemAdd(queryrefresh , nil)
-        
-        print(statusref)
-        
-        if statusref != errSecSuccess {
-            throw keychainError.Failed(statusref)
+        let status = SecItemAdd(queryrefresh , nil)
+        if status == errSecSuccess {
+            return
         }
-        
-        //access token in keychain
-        
-        let queryaccess = [     kSecValueData :tokens.accessToken.data(using: .utf8) as Any,
-                              kSecAttrAccount : "accessToken",
-                                     kSecClass:kSecClassGenericPassword
-                                
-                                
-        ]   as CFDictionary
-        
-        let statusacc = SecItemAdd(queryaccess , nil)
-        
-        
-        
-        print(statusacc)
-        
-        if statusacc  != errSecSuccess {
-            throw keychainError.Failed(statusacc)
+        else if status == errSecDuplicateItem {
+            
+            let searchQuery = [
+                kSecAttrAccount : account ,
+                kSecClass : kSecClassGenericPassword
+            ] as CFDictionary
+            
+            let atrributes = [ kSecValueData : value.data(using: .utf8) ] as CFDictionary
+            
+            let updateStatus = SecItemUpdate(searchQuery, atrributes)
+            
+            if updateStatus != errSecSuccess {
+                throw keychainError.Failed(updateStatus)
+            }
+            
         }
-        
-        
-        
+        else {
+            throw keychainError.Failed(status)
+        }
     }
-    
     
     static  func getRefreshToken() -> String{
         let queryref = [
@@ -142,7 +141,7 @@ enum keychainService {
         if status == errSecSuccess , let passwordData = item as? Data {
             let ref = String(decoding : passwordData , as :  UTF8.self)
             reftoken = ref
-            print(reftoken)
+        
         }
         
         return reftoken
@@ -168,7 +167,7 @@ enum keychainService {
         if statusacc == errSecSuccess , let passwordData = itemacc as? Data {
             let acc = String(decoding : passwordData , as :  UTF8.self)
             accesstoken = acc
-            print(accesstoken)
+
         }
         
         
@@ -178,16 +177,10 @@ enum keychainService {
     
     static func writeId(id : String) throws {
         
-        let id  = [kSecValueData : id.data(using: .utf8)!,
-                           kSecAttrAccount : "myId",
-                                  kSecClass:kSecClassGenericPassword
-                             
-        ]   as CFDictionary
-        
-        
-        let statusref = SecItemAdd(id , nil)
-        
-        print(statusref)
+    
+            
+            try writeToken(value: id, account: "myId")
+    
     }
     
     static func  deleteId()  throws {

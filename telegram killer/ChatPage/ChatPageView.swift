@@ -20,7 +20,7 @@ struct ChatPageView: View {
     @State private var  offset : [String :CGFloat]  = [:]
     
     
-    
+    @State private var lastMarkedIndex: Int = -1
     
     init(ChatPageVM : ChatPageVM ){
         self._viewModel = StateObject(wrappedValue: ChatPageVM)
@@ -63,7 +63,7 @@ struct ChatPageView: View {
                             else {
                                 if let dis = distanceFromBottom {
                                     print("dis \(dis)")
-                                    if dis < 3 {
+                                    if dis <  3 {
                                         withAnimation{
                                             scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor : .bottom)
                                         }
@@ -109,14 +109,17 @@ struct ChatPageView: View {
                         }
                         
                     }
-                }.scrollPosition($scrollPosition)
+                }.scrollPosition($scrollPosition , anchor: .bottom)
                     .onChange(of: scrollPosition){
                         let dis = distanceFromBottom ?? 0
                         showScrollButton = dis > 0
                         var cur = lastElementNow
-                        if viewModel.messages.firstIndex(where: {$0.id == viewModel.lastRead}) ?? 0 < cur {
+                        
+                      
+                        if lastMarkedIndex < cur {
                             let messageAtCur =  viewModel.messages[cur]
                             if !messageAtCur.fromMe{
+                                lastMarkedIndex = cur
                                 Task{
                                     await viewModel.markAsRead(messageId: viewModel.messages[cur].id )
                                 }
@@ -219,6 +222,8 @@ extension ChatPageView {
                                     Image(systemName :{
                                         let current = viewModel.messages.firstIndex(where: {$0.id == mes.id}) ?? 0
                                         let last = viewModel.messages.firstIndex(where: {$0.id == viewModel.lastRead}) ?? 0
+                                        print("current mes \(mes.id)")
+                                        print("last read \(viewModel.lastRead)")
                                         return current <= last ? "checkmark.circle.fill" :  "checkmark.circle"
                                     }())
                                     
@@ -302,9 +307,8 @@ extension ChatPageView {
             return nil }
         
         let rawDistance = lastIndex -  currentIndex
-        let viewportSize = 11
-        let adjusted = rawDistance - viewportSize
-        return max(0,adjusted)
+        
+        return max(0,rawDistance)
     }
     
     var lastElementNow : Int {
@@ -314,8 +318,7 @@ extension ChatPageView {
         else {print("not long enough")
             return 0 }
 
-        let adjustedIndex = min(currentIndex + 11, viewModel.messages.count - 1)
-        return adjustedIndex
+       return currentIndex
         
     }
     

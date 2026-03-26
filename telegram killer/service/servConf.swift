@@ -13,6 +13,7 @@ enum servConf : String {
     case server = "http://localhost:8080"
     
     
+    
     static var baseURL  : String{
         servConf.server.rawValue
     }

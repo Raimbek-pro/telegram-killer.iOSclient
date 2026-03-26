@@ -91,6 +91,7 @@ class ChatPageVM : ObservableObject {
 //        }
         Task{
             for await message in self.hub.readReceiptStream {
+                print("received message \(message)")
                 self.lastRead = message.messageId
             }
         }

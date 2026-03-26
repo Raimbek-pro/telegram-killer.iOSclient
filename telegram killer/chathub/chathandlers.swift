@@ -49,8 +49,8 @@ class chatHub   {
     }
     
     func markAsReadRequest(chatId : String , messageId : String ) async throws {
-        try await connection.send(method: "markAsRead", arguments: chatId  , messageId )
-        print("joined")
+        try await connection.send(method: "MarkAsRead", arguments: chatId  , messageId )
+        print("read")
         
     }
     
@@ -94,8 +94,8 @@ class chatHub   {
         AsyncStream { continuation in
             
             Task {
-                await connection.on("messageRead"){ (message : MessageRead) in
-                 
+                await connection.on("MessageRead"){ (message : MessageRead) in
+                 print("received")
                     continuation.yield(message)
                 }
 
