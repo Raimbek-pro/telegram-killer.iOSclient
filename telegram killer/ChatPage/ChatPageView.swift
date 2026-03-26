@@ -43,7 +43,6 @@ struct ChatPageView: View {
             
           
             ZStack{
-               
                 GeometryReader { geo in
                     let screenWidth = geo.size.width
                 
@@ -53,66 +52,24 @@ struct ChatPageView: View {
                     }
                     .scrollTargetLayout()
                     .onChange(of: viewModel.messages ) {
-                    
-                        if let me = viewModel.messages.last?.fromMe {
-                            if me {
-                                withAnimation{
-                                        scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor : .bottom)
-                                }
-                            }
-                            else {
-                                if let dis = distanceFromBottom {
-                                    print("dis \(dis)")
-                                    if dis <  3 {
-                                        withAnimation{
-                                            scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor : .bottom)
-                                        }
-                                    }
-                                    else {
-                                        showScrollButton = true
-                                    }
-                                    
-                                }
-                            }
-                        }
+                        self.scrollIfCloseOrMe()
                     }
                     .onChange(of: viewModel.isLoaded){
                         if let las  = viewModel.lastRead {
-                            let posAfter =  min((viewModel.messages.firstIndex(where: { $0.id == las}) ?? 0) + 1 , viewModel.messages.count - 1)
-                            if las == viewModel.messages.last?.id {
-                                scrollPosition.scrollTo(id: viewModel.messages[posAfter].id , anchor : .bottom)
-                               
-                            } else{
-                                scrollPosition.scrollTo(id: viewModel.messages[posAfter].id, anchor: .bottom)
-                                
-                                Task{
-                                    if !viewModel.messages[posAfter].fromMe{
-                                     
-                                        await viewModel.markAsRead(messageId: viewModel.messages[posAfter].id )
-                                    }
-                                }
-                            }
-                          
+                            self.readmessageAfter(las: las)
                         } else {
-                            scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor:  .bottom)
-                            if viewModel.messages.last != nil {
-                                
-                                if !viewModel.messages.last!.fromMe {
-                                    
-                                    Task{
-                                       
-                                        await viewModel.markAsRead(messageId: viewModel.messages.last!.id )
-                                    }
-                                }
-                            }
-                            
+                            self.scrollDownAndMark()
                         }
                         
                     }
-                }.scrollPosition($scrollPosition , anchor: .bottom)
-                    .onChange(of: scrollPosition){
+                }
+                .scrollPosition($scrollPosition , anchor: .bottom)
+                .onChange(of: scrollPosition){
+                     // MARK:  should i show scroll button?
                         let dis = distanceFromBottom ?? 0
                         showScrollButton = dis > 0
+                    
+                    // MARK: mark as read new messages
                         var cur = lastElementNow
                         
                       
@@ -126,26 +83,21 @@ struct ChatPageView: View {
                             }
                           
                         }
-                        
                     }
-                
             }
-                    VStack{
-                        Spacer()
-                        if showScrollButton {
-                                scrollButton
-                        }
-                    }
+            VStack{
+                Spacer()
+                if showScrollButton {scrollButton}
+                }
                 }
             
             HStack{
-                
               TextField("send message", text: $message)
                     .frame(height: 40)
                     .glassEffect()
                     .padding(20)
-                   
-                sendMessage
+                
+            sendMessage
                     
             }
      
@@ -156,11 +108,8 @@ struct ChatPageView: View {
             ], startPoint: .topLeading, endPoint:   .bottomTrailing)
             .ignoresSafeArea()
             )
-        
         .task {
-        
-                 await viewModel.startConnection()
-                
+            await viewModel.startConnection()
         }
         .onDisappear{
             Task{
@@ -210,50 +159,39 @@ extension ChatPageView {
                             Spacer()
                         }
                         
-                            VStack(alignment: .leading){
+                        //message itself
+                        VStack(alignment: .leading){
                                 Text(mes.message)
-                                  
-                                
                                     .alignmentGuide(.leading, computeValue: { dim in
                                         dim[.trailing]
                                     })
-                                
-                                if mes.fromMe{
-                                    Image(systemName :{
-                                        let current = viewModel.messages.firstIndex(where: {$0.id == mes.id}) ?? 0
-                                        let last = viewModel.messages.firstIndex(where: {$0.id == viewModel.lastRead}) ?? 0
-                                        print("current mes \(mes.id)")
-                                        print("last read \(viewModel.lastRead)")
-                                        return current <= last ? "checkmark.circle.fill" :  "checkmark.circle"
-                                    }())
-                                    
-                                    .padding(.horizontal , 5)
+                             
+                        //checkmark
+                        if mes.fromMe{
+                            Image(systemName :{
+                                let current = viewModel.messages.firstIndex(where: {$0.id == mes.id}) ?? 0
+                                let last = viewModel.messages.firstIndex(where: {$0.id == viewModel.lastRead}) ?? 0
+                                return current <= last ? "checkmark.circle.fill" :  "checkmark.circle"
+                            }())
+                                .padding(.horizontal , 5)
                                 }
                                 
                             }
-                            
                             .frame(minWidth: 20,  alignment: .leading)
                             .padding()
-                           
                             .glassEffect(
                                 .clear.interactive(),
-                                            in: RoundedRectangle(cornerRadius: 30)
+                                in: RoundedRectangle(cornerRadius: 30)
                                         )
-                            
-                            
-                        
-                        
-                        
+ 
                         if !mes.fromMe {
                             Spacer()
                         }
                         
                     }
-                    
                     .offset(x: offset[mes.id] ?? 0)
                     .contentShape(Rectangle())
-                   .simultaneousGesture(
-                
+                    .simultaneousGesture(
                         DragGesture(minimumDistance: 20)
                             .onChanged{ value in
                                 let translation = value.translation.width
@@ -270,23 +208,14 @@ extension ChatPageView {
                     )
                 }
                 .id(mes.id)
-            
-                
-            
-         
-            
         }
     }
+    
     var scrollButton : some View {
-  
-            
             Button(action: {
-                
                 scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor : .bottom)
                     showScrollButton = false
-                
-                
-
+ 
             }, label: {
                 Image(systemName: "arrow.down")
                     .foregroundStyle(.gray)
@@ -294,7 +223,6 @@ extension ChatPageView {
                     .glassEffect()
                     .clipShape(.circle)
             })
-        
     }
     
     var distanceFromBottom : Int? {
@@ -327,7 +255,69 @@ extension ChatPageView {
 }
 
 
+extension ChatPageView {
+    
+    func scrollIfCloseOrMe() {
+        if let me = viewModel.messages.last?.fromMe {
+            if me {
+                withAnimation{
+                        scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor : .bottom)
+                }
+            }
+            else {
+                if let dis = distanceFromBottom {
+         
+                    if dis <  3 {
+                        withAnimation{
+                            scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor : .bottom)
+                        }
+                    }
+                    else {
+                        showScrollButton = true
+                    }
+                    
+                }
+            }
+        }
+    }
+}
 
+extension ChatPageView {
+    
+    func readmessageAfter(las : String ) {
+        let posAfter =  min((viewModel.messages.firstIndex(where: { $0.id == las}) ?? 0) + 1 , viewModel.messages.count - 1)
+        if las == viewModel.messages.last?.id {
+            scrollPosition.scrollTo(id: viewModel.messages[posAfter].id , anchor : .bottom)
+           
+        } else{
+            scrollPosition.scrollTo(id: viewModel.messages[posAfter].id, anchor: .bottom)
+            
+            Task{
+                if !viewModel.messages[posAfter].fromMe{
+                 
+                    await viewModel.markAsRead(messageId: viewModel.messages[posAfter].id )
+                }
+            }
+        }
+    }
+    
+    func scrollDownAndMark() {
+        // scroll to last position and if message isnt mine mark it as read
+        
+        scrollPosition.scrollTo(id: viewModel.messages.last?.id , anchor:  .bottom)
+        if viewModel.messages.last != nil {
+            
+            if !viewModel.messages.last!.fromMe {
+                
+                Task{
+                   
+                    await viewModel.markAsRead(messageId: viewModel.messages.last!.id )
+                }
+            }
+        }
+        
+    }
+}
 #Preview {
     ChatPageView(ChatPageVM: ChatPageVM.preview())
 }
