@@ -33,8 +33,11 @@ Tokens Cycle
 
 Liquid Glass
 
+Real time events with sockets
 
+KeyChain Storage
 
+Swift Actors
 
 
 ## Prerequisites :
@@ -43,7 +46,7 @@ iOS 26+
 
 Xcode 26
 
-
+SignalRClient (websocket client) dependency
 ## Usage :
 
 
