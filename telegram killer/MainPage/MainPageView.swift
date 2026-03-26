@@ -14,9 +14,11 @@ struct MainPageView : View {
     
     @State var  isShaking  = false
 
-    
+    @Environment(\.colorScheme) var colorScheme
 
-    
+
+
+  
     @State var email = ""
     init(viewModel : MainPageVM){
         self._viewModel = StateObject(wrappedValue: viewModel)
@@ -41,12 +43,10 @@ struct MainPageView : View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(
-                LinearGradient(colors: [
-                    .white.opacity(0.5), .blue.opacity(0.5), .cyan.opacity(0.2)
-                ], startPoint: .topLeading, endPoint:   .bottomTrailing)
-                .ignoresSafeArea()
-            )
+        .background(
+            Color.appBackground(colorScheme)
+        )
+  
         
     }
 }
@@ -180,6 +180,8 @@ extension MainPageView {
             }
         }
     }
+    
+
 }
 
 
@@ -195,3 +197,5 @@ extension MainPageView {
     ]
     return MainPageView(viewModel: MainPageVM(routerChat: router(navcontroller: UINavigationController(), dataSource: mock),  with:  mock))
 }
+
+

@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ChatPageView: View {
     
-  
+    @Environment(\.colorScheme) var colorScheme
     @StateObject var  viewModel : ChatPageVM
     @State var email = ""
     @State var message = ""
@@ -103,9 +103,7 @@ struct ChatPageView: View {
      
         }
         .background(
-            LinearGradient(colors: [
-                .white.opacity(0.3), .blue.opacity(0.7)
-            ], startPoint: .topLeading, endPoint:   .bottomTrailing)
+            Color.appBackground(colorScheme)
             .ignoresSafeArea()
             )
         .task {

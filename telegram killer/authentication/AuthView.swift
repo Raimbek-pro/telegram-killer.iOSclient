@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AuthView: View {
     
+    @Environment(\.colorScheme) var colorScheme
     @StateObject var viewModel : authVM
     @State var isLost  = false
     @State var isLoading = false
@@ -18,12 +19,17 @@ struct AuthView: View {
     }
    @State var email = ""
     var body: some View {
-       textfield
-        
-       buttonSend
-        
-       textWarnView
-        
+        VStack{
+            
+            
+            textfield
+            
+            buttonSend
+            
+            textWarnView
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.appBackground(colorScheme))
      
     }
     
