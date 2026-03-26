@@ -1,9 +1,3 @@
-//
-//  README.md
-//  telegram killer
-//
-//  Created by Райымбек Омаров on 26.03.2026.
-//
 
 
 # Telegram Killer
@@ -15,9 +9,9 @@ Chat iOS client using SwiftUI + UIKit . Allows sending plain text  messages and 
 
 ##  Screenshots
 <p align="center">
-  <img src="Screenshots/chat.png" width="250"/>
-  <img src="Screenshots/darkmode.png" width="250"/>
-  <img src="Screenshots/lightmode.png" width="250"/>
+  <img src="screenshots/screen1.png" width="250"/>
+  <img src="screenshots/screen2.png" width="250"/>
+  <img src= "creenshots/screen3.png" width="250"/>
 </p>
 
 ## Tech Stack:
@@ -44,19 +38,22 @@ iOS 26+
 
 Xcode 26
 
-Clone this repository
 
-git clone https://github.com/Raimbek-pro/telegram-killer.iOSclient.git
-cd telegram-killer.iOSclient
-open telegram killer.xcodeproj
+##Usage :
 
 
-follow instructions from Telegram-killer.API  : https://github.com/blendereru/telegram-killer.API
+-- Clone this repository
 
-start docker :
+-- git clone https://github.com/Raimbek-pro/telegram-killer.iOSclient.git
+-- cd telegram-killer.iOSclient
+--open telegram killer.xcodeproj
 
-docker compose up --build
 
-build the app
+## follow instructions from Telegram-killer.API  :
+
+https://github.com/blendereru/telegram-killer.API
+
+
+
 
 
