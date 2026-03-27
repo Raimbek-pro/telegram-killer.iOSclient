@@ -19,8 +19,12 @@ class ChatPageVM : ObservableObject {
     var chatId : String
   @Published  var lastRead : String?
  
-   @Published var isLoaded = false
+   @Published var isLoaded = true
     @Published var messages: [Message] = []
+    
+    @Published var lastReadofPerson = ""
+    
+    @Published var initialScrollTarget: String? = nil
     
     private let dataSource : ChatDataSourceProtocol
 
@@ -53,6 +57,12 @@ class ChatPageVM : ObservableObject {
             print("lastRead from server: \(las)")
            
         }
+        if let lasOther = messages.otherParticipantReadStates.first?.lastReadMessageId {
+            self.lastReadofPerson = lasOther
+        }
+        
+        
+        
     }
     
     func saveChat(email : String , lastMessage : MessageInfo){
@@ -61,14 +71,9 @@ class ChatPageVM : ObservableObject {
     }
     
     func startConnection() async   {
-        
-        
-    
-            try? await self.startConnectionMessage()
- 
-                                                
-   
-      
+
+        try? await self.startConnectionMessage()
+
     }
     
     
@@ -79,20 +84,14 @@ class ChatPageVM : ObservableObject {
            try await self.hub.joinChat(chatId: usersChat.chatId)
         }, router:routerChat)
       
-        isLoaded = true
+        isLoaded = false
         
-//        
-//        Task {
-//            for await (chatId ,messageId) in self.hub.readReceiptStream {
-//                self.lastPosId = messageId
-//            
-//                
-//            }
-//        }
+       
+  
         Task{
             for await message in self.hub.readReceiptStream {
                 print("received message \(message)")
-                self.lastRead = message.messageId
+                self.lastReadofPerson = message.messageId
             }
         }
         Task{
@@ -103,6 +102,7 @@ class ChatPageVM : ObservableObject {
                 
             }
         }
+      
         
         
     }

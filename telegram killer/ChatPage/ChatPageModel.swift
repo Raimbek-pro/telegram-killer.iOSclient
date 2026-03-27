@@ -38,9 +38,6 @@ struct UsersChat : Codable {
 }
 
 
-//struct Messages : Codable {
-//    let messages : [MessageInfo]
-//}
 
 
 
@@ -48,6 +45,7 @@ struct Messages : Codable {
     let chatId : String
     let messages : [MessageInfo]
     let lastReadMessageId : String?
+    let otherParticipantReadStates : [OtherParticapantReadStates]
 }
 
 struct MessageInfo : Codable , Identifiable{
@@ -66,4 +64,10 @@ struct MessageRead  : Codable {
     let userId : String
     let readAt : String
     
+}
+
+
+struct OtherParticapantReadStates : Codable {
+    let userId : String
+    let lastReadMessageId : String?
 }

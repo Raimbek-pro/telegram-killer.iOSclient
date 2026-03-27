@@ -19,8 +19,10 @@ struct ChatPageView: View {
     
     @State private var  offset : [String :CGFloat]  = [:]
     
-    
+    @State private var isLoadedforMessages = true
     @State private var lastMarkedIndex: Int = -1
+    
+   
     
     init(ChatPageVM : ChatPageVM ){
         self._viewModel = StateObject(wrappedValue: ChatPageVM)
@@ -50,19 +52,25 @@ struct ChatPageView: View {
                     LazyVStack{
                         chatScroll(screenWidth: screenWidth)
                     }
+                //    .redacted(reason: viewModel.isLoaded ?    .placeholder : [] )
                     .scrollTargetLayout()
                     .onChange(of: viewModel.messages ) {
                         self.scrollIfCloseOrMe()
                     }
-                    .onChange(of: viewModel.isLoaded){
-                        if let las  = viewModel.lastRead {
-                            self.readmessageAfter(las: las)
-                        } else {
-                            self.scrollDownAndMark()
+                    .onChange(of: viewModel.isLoaded) {
+                        Task { @MainActor in
+                            try? await Task.sleep(for: .milliseconds(50))
+                            if let las = viewModel.lastRead {
+                                self.readmessageAfter(las: las)
+                            } else {
+                                self.scrollDownAndMark()
+                            }
                         }
-                        
                     }
                 }
+                    
+                .defaultScrollAnchor(.bottom)
+                .frame(width: geo.size.width, height: geo.size.height)
                 .scrollPosition($scrollPosition , anchor: .bottom)
                 .onChange(of: scrollPosition){
                      // MARK:  should i show scroll button?
@@ -85,6 +93,7 @@ struct ChatPageView: View {
                         }
                     }
             }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             VStack{
                 Spacer()
                 if showScrollButton {scrollButton}
@@ -107,8 +116,12 @@ struct ChatPageView: View {
             .ignoresSafeArea()
             )
         .task {
-            await viewModel.startConnection()
+        
+                await viewModel.startConnection()
+         
+            
         }
+        
         .onDisappear{
             Task{
                 try? await viewModel.hub.leaveChat(chatId: viewModel.chatId)
@@ -168,7 +181,7 @@ extension ChatPageView {
                         if mes.fromMe{
                             Image(systemName :{
                                 let current = viewModel.messages.firstIndex(where: {$0.id == mes.id}) ?? 0
-                                let last = viewModel.messages.firstIndex(where: {$0.id == viewModel.lastRead}) ?? 0
+                                let last = viewModel.messages.firstIndex(where: {$0.id == viewModel.lastReadofPerson}) ?? 0
                                 return current <= last ? "checkmark.circle.fill" :  "checkmark.circle"
                             }())
                                 .padding(.horizontal , 5)
@@ -206,6 +219,7 @@ extension ChatPageView {
                     )
                 }
                 .id(mes.id)
+               
         }
     }
     
@@ -308,7 +322,6 @@ extension ChatPageView {
             if !viewModel.messages.last!.fromMe {
                 
                 Task{
-                   
                     await viewModel.markAsRead(messageId: viewModel.messages.last!.id )
                 }
             }
